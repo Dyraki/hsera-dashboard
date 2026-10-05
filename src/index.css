@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ============================================================
+     FRAMEWORK V1 DESIGN SYSTEM TOKENS (CSS VARIABLES)
+     ============================================================ */
+
+  /* 1. BRAND COLORS */
+  --primary-900: #231043;
+  --primary-800: #231034;
+  --primary-700: #3B176D;
+  --primary-600: #6D28D9; /* Primary Interactive / Action */
+  --primary-500: #7C3AED;
+  --primary-100: #EDE9FE;
+  --primary-50: #F5F3FF;
+
+  --gold-600: #B89B4A;
+  --gold-500: #D3B973;    /* Signature Accent */
+  --gold-100: #F5EED5;
+
+  /* 2. SEMANTIC COLORS */
+  --success-600: #15803D;
+  --success-500: #16A34A;
+  --success-100: #DCFCE7;
+  --success-50: #F0FDF4;
+
+  --warning-600: #B45309;
+  --warning-500: #F59E0B;
+  --warning-100: #FEF3C7;
+  --warning-50: #FFFBEB;
+
+  --error-600: #B91C1C;
+  --error-500: #DC2626;
+  --error-100: #FEE2E2;
+  --error-50: #FEF2F2;
+
+  --info-600: #0369A1;
+  --info-500: #0284C7;
+  --info-100: #E0F2FE;
+  --info-50: #F0F9FF;
+
+  /* 3. NEUTRAL / GRAY */
+  --gray-950: #111827;
+  --gray-900: #1F2937;
+  --gray-700: #374151;
+  --gray-600: #4B5563;
+  --gray-500: #6B7280;
+  --gray-400: #9CA3AF;
+  --gray-300: #D1D5DB;
+  --gray-200: #E5E7EB;
+  --gray-100: #F3F4F6;
+  --gray-50: #F9FAFB;
+  --white: #FFFFFF;
+
+  /* 4. TYPOGRAPHY */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* 5. BORDER RADIUS */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;   /* Default: Button, Input */
+  --radius-lg: 12px;  /* Default: Card */
+  --radius-xl: 16px;  /* Default: Modal / Slide-over */
+  --radius-2xl: 24px;
+  --radius-full: 9999px; /* Default: Badge, Switch */
+
+  /* 6. FORM HEIGHTS */
+  --form-height-sm: 32px;
+  --form-height-md: 40px; /* Default: 40px */
+  --form-height-lg: 48px;
+}
+
+html, body {
+  margin: 0;
+  font-family: var(--font-family);
+  background-color: var(--gray-50);
+  color: var(--gray-700);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar - Professional & Sleek */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E5E7EB;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D1D5DB;
+}
+
+aside ::-webkit-scrollbar-thumb {
+  background: #374151;
+}
+
+aside ::-webkit-scrollbar-thumb:hover {
+  background: #4B5563;
+}
+
+/* ============================================================
+   DESIGN SYSTEM BUTTON & COLOR UTILITIES
+   ============================================================ */
+.btn-primary,
+button[data-variant="primary"],
+.bg-primary-600 {
+  background-color: #6D28D9 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-primary:hover,
+button[data-variant="primary"]:hover:not(:disabled),
+.hover\:bg-primary-700:hover {
+  background-color: #5B21B6 !important;
+}
+
+.btn-primary:active,
+button[data-variant="primary"]:active:not(:disabled),
+.active\:bg-primary-800:active {
+  background-color: #4C1D95 !important;
+}
+
+.btn-secondary,
+button[data-variant="secondary"] {
+  background-color: #F3F4F6 !important;
+  color: #374151 !important;
+  border: 1px solid #E5E7EB !important;
+}
+.btn-secondary:hover,
+button[data-variant="secondary"]:hover:not(:disabled) {
+  background-color: #E5E7EB !important;
+}
+
+.btn-outline,
+button[data-variant="outline"] {
+  background-color: #FFFFFF !important;
+  color: #374151 !important;
+  border: 1px solid #D1D5DB !important;
+}
+.btn-outline:hover,
+button[data-variant="outline"]:hover:not(:disabled) {
+  background-color: #F9FAFB !important;
+  border-color: #9CA3AF !important;
+}
+
+.btn-md,
+button[data-size="md"] {
+  height: 40px !important;
+  min-height: 40px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  font-size: 14px !important;
+  border-radius: 8px !important;
+}
+
+.btn-sm,
+button[data-size="sm"] {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+}
+
+.btn-lg,
+button[data-size="lg"] {
+  height: 48px !important;
+  min-height: 48px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  font-size: 16px !important;
+  border-radius: 8px !important;
+}
