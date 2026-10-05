@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AdminLayout } from '@/presentation/components/layout/AdminLayout';
+import { AdminLayout } from '@/presentation/components/layout';
 import { Button } from '@/presentation/components/ui/Button';
 import { Construction, ArrowLeft } from 'lucide-react';
 
