@@ -12,6 +12,7 @@ import { Input, Select } from '../../../components/form';
 import { Button } from '@/presentation/components/ui/Button';
 import { Badge } from '@/presentation/components/ui/Badge';
 import { Plus, Pencil, Trash2, LayoutGrid, AlertCircle } from 'lucide-react';
+import { MenuIcon, AVAILABLE_MENU_ICONS } from '@/presentation/components/ui/MenuIcon';
 
 export const MenuListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,7 +36,7 @@ export const MenuListPage: React.FC = () => {
   const [formTipe, setFormTipe] = useState('Menu');
   const [formLevel, setFormLevel] = useState(1);
   const [formLink, setFormLink] = useState('');
-  const [formIcon, setFormIcon] = useState('glyphicon glyphicon-file');
+  const [formIcon, setFormIcon] = useState('LayoutDashboard');
   const [formAktif, setFormAktif] = useState(1);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,7 +89,7 @@ export const MenuListPage: React.FC = () => {
     setFormTipe('Menu');
     setFormLevel(1);
     setFormLink('');
-    setFormIcon('glyphicon glyphicon-file');
+    setFormIcon('LayoutDashboard');
     setFormAktif(1);
     setIsDrawerOpen(true);
   };
@@ -109,7 +110,7 @@ export const MenuListPage: React.FC = () => {
     setFormTipe(menu.tipe || 'Menu');
     setFormLevel(menu.level || 1);
     setFormLink(menu.link || '');
-    setFormIcon(menu.icon || 'glyphicon glyphicon-file');
+    setFormIcon(menu.icon || 'LayoutDashboard');
     setFormAktif(menu.aktif);
     setIsDrawerOpen(true);
   };
@@ -256,7 +257,7 @@ export const MenuListPage: React.FC = () => {
                       {canUpdateMenu && (
                         <button
                           onClick={() => handleOpenEdit(menu)}
-                          className="p-1.5 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                          className="p-1.5 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
                           title="Edit Menu"
                         >
                           <Pencil size={15} />
@@ -265,7 +266,7 @@ export const MenuListPage: React.FC = () => {
                       {canDeleteMenu && (
                         <button
                           onClick={() => handleDelete(menu.id)}
-                          className="p-1.5 rounded-md text-error-600 hover:bg-error-50 transition-colors"
+                          className="p-1.5 rounded-md text-error-600 hover:bg-error-50 transition-colors cursor-pointer"
                           title="Hapus Menu"
                         >
                           <Trash2 size={15} />
@@ -278,10 +279,16 @@ export const MenuListPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 text-center font-mono text-caption text-gray-500">{menu.urut}</td>
                     <td className="px-6 py-4 text-gray-900 font-semibold">
-                      <span style={{ paddingLeft: `${(menu.level - 1) * 12}px` }} className="inline-block">
-                        {menu.level > 1 && <span className="text-gray-300 mr-1">└─</span>}
-                        {menu.nama}
-                      </span>
+                      <div
+                        style={{ paddingLeft: `${(menu.level - 1) * 16}px` }}
+                        className="flex items-center gap-2.5"
+                      >
+                        {menu.level > 1 && <span className="text-gray-300 mr-0.5">└─</span>}
+                        <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-primary-600 shrink-0">
+                          <MenuIcon icon={menu.icon} name={menu.nama} size={15} />
+                        </div>
+                        <span className="truncate">{menu.nama}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <Badge variant={menu.tipe === 'Header' ? 'gold' : 'primary'} size="sm">
@@ -424,22 +431,81 @@ export const MenuListPage: React.FC = () => {
             />
           </div>
 
-          <Input
-            label="Link URL Path"
-            value={formLink}
-            onChange={(e) => setFormLink(e.target.value)}
-            disabled={isSubmitting}
-            placeholder="Contoh: settings/roleuser"
-            helperText="Kosongkan jika bertipe Header (dropdown)."
-          />
+          <div className="space-y-1.5">
+            <Input
+              label="Link URL Path"
+              value={formLink}
+              onChange={(e) => setFormLink(e.target.value)}
+              disabled={isSubmitting}
+              placeholder="Contoh: settings/roleuser atau coming-soon"
+              helperText="Kosongkan jika bertipe Header. Gunakan 'coming-soon' untuk halaman dalam pengembangan."
+            />
+            <div className="flex items-center gap-2 pt-0.5">
+              <span className="text-[11px] text-gray-500 font-medium">Quick Preset:</span>
+              <button
+                type="button"
+                onClick={() => setFormLink('coming-soon')}
+                className="text-[11px] font-mono px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer"
+                title="Gunakan rute coming-soon"
+              >
+                coming-soon
+              </button>
+            </div>
+          </div>
 
-          <Input
-            label="CSS Class Icon"
-            value={formIcon}
-            onChange={(e) => setFormIcon(e.target.value)}
-            disabled={isSubmitting}
-            placeholder="glyphicon glyphicon-file"
-          />
+          {/* Enhanced Icon Picker with Live Preview */}
+          <div className="space-y-2.5 pt-1">
+            <div className="flex items-center justify-between">
+              <label className="text-body-sm font-semibold text-gray-700">
+                Icon Menu (CSS Class / Lucide)
+              </label>
+              <div className="flex items-center gap-2 px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-lg">
+                <span className="text-caption text-gray-500 font-medium">Preview:</span>
+                <div className="w-6 h-6 rounded bg-primary-50 text-primary-600 flex items-center justify-center">
+                  <MenuIcon icon={formIcon} name={formNama} size={16} />
+                </div>
+              </div>
+            </div>
+
+            <Input
+              value={formIcon}
+              onChange={(e) => setFormIcon(e.target.value)}
+              disabled={isSubmitting}
+              placeholder="Contoh: LayoutDashboard, Users, MapPin, Building2..."
+              helperText="Ketik nama icon Lucide / legacy CSS class atau pilih dari icon populer di bawah."
+            />
+
+            {/* Quick Icon Selector Grid */}
+            <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-200">
+              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                Pilih Icon Cepat:
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-44 overflow-y-auto pr-1">
+                {AVAILABLE_MENU_ICONS.map((item) => {
+                  const isSelected = formIcon.toLowerCase() === item.key.toLowerCase();
+                  const IconComp = item.icon;
+                  return (
+                    <button
+                      key={item.key}
+                      type="button"
+                      onClick={() => setFormIcon(item.key)}
+                      title={item.label}
+                      className={`flex flex-col items-center justify-center p-2 rounded-lg border text-center transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-primary-50 border-primary-500 text-primary-700 font-bold shadow-xs'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-100/70'
+                      }`}
+                    >
+                      <IconComp size={18} className={isSelected ? 'text-primary-600' : 'text-gray-500'} />
+                      <span className="text-[10px] mt-1 truncate max-w-full leading-tight font-medium">
+                        {item.key}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </form>
       </SlideOver>
     </AdminLayout>

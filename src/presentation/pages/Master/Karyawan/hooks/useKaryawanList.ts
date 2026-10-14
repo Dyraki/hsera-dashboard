@@ -22,7 +22,7 @@ export const useKaryawanList = ({ onError }: KaryawanListOptions) => {
   const fetchLookups = async () => {
     try {
       const [units, employeesPage] = await Promise.all([
-        useCases.getOperationUnits.execute(),
+        useCases.getOperationUnits.execute({ scope: true }),
         useCases.getKaryawanPage.execute({ page: 1, limit: 100 })
       ]);
       setAvailableUnits(units.map(({ id, code, name, type }) => ({ id, code, name, type })));

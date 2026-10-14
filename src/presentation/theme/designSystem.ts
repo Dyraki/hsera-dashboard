@@ -9,14 +9,14 @@ export const DesignSystem = {
   // 1. BRAND COLOR
   brand: {
     primary: {
-      900: '#231043', // dark purple / brand identity
-      800: '#231034', // dark brand
-      700: '#3B176D', // dark purple
-      600: '#6D28D9', // primary interactive / action
-      500: '#7C3AED', // highlight
-      100: '#EDE9FE', // light purple background
-      50: '#F5F3FF',  // very light purple background
-      DEFAULT: '#6D28D9',
+      900: '#680a0d', // dark red / brand identity
+      800: '#9e1317', // dark brand
+      700: '#c81e22', // dark red
+      600: '#eb282d', // primary interactive / action
+      500: '#f04a4e', // highlight
+      100: '#fee2e2', // light red background
+      50: '#fef2f2',  // very light red background
+      DEFAULT: '#eb282d',
     },
     accent: {
       gold600: '#B89B4A', // premium accent
@@ -131,8 +131,8 @@ export const DesignSystem = {
     },
     borderDefault: '#D1D5DB', // Gray 300
     borderHover: '#9CA3AF',   // Gray 400
-    borderFocus: '#6D28D9',   // Primary 600
-    ringFocus: '#EDE9FE',     // Primary 100
+    borderFocus: '#eb282d',   // Primary 600
+    ringFocus: '#fee2e2',     // Primary 100
     bgDisabled: '#F3F4F6',    // Gray 100
     borderDisabled: '#E5E7EB',// Gray 200
     textDisabled: '#9CA3AF',  // Gray 400

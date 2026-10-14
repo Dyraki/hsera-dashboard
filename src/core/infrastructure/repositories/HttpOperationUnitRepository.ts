@@ -1,4 +1,4 @@
-import { IOperationUnitRepository } from '../../domain/repositories/IOperationUnitRepository';
+import { IOperationUnitRepository, OperationUnitFilterParams } from '../../domain/repositories/IOperationUnitRepository';
 import { OperationUnit, OperationUnitWriteData } from '../../domain/models/OperationUnit';
 import { AxiosHttpClient } from '../api/AxiosHttpClient';
 import { OperationUnitDto } from '../dto/OperationUnitDto';
@@ -10,8 +10,17 @@ export class HttpOperationUnitRepository implements IOperationUnitRepository {
     return (response.data || []).map(toOperationUnit);
   }
 
-  async list(): Promise<OperationUnit[]> {
-    const response = await AxiosHttpClient.get<OperationUnitDto[]>('/api/operation-units');
+  async list(params?: OperationUnitFilterParams): Promise<OperationUnit[]> {
+    const query = new URLSearchParams();
+    if (params?.scope) query.append('scope', 'true');
+    if (params?.onlyBranches) query.append('onlyBranches', 'true');
+    if (params?.type) query.append('type', params.type);
+    if (params?.status !== undefined) query.append('status', String(params.status));
+    if (params?.search) query.append('search', params.search);
+
+    const queryString = query.toString();
+    const url = queryString ? `/api/operation-units?${queryString}` : '/api/operation-units';
+    const response = await AxiosHttpClient.get<OperationUnitDto[]>(url);
     return (response.data || []).map(toOperationUnit);
   }
 

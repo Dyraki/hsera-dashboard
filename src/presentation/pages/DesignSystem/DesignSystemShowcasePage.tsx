@@ -60,45 +60,45 @@ export const DesignSystemShowcasePage: React.FC = () => {
           <div className="space-y-4">
             <h3 className="text-h3 text-gray-900">1. Brand Color</h3>
             <p className="text-body-sm text-gray-600">
-              <span className="font-semibold text-gray-900">#231043</span> sebagai identitas brand utama,{' '}
-              <span className="font-semibold text-gray-900">#6D28D9</span> sebagai warna interactive/action, dan{' '}
+              <span className="font-semibold text-gray-900">#680a0d</span> sebagai identitas brand utama,{' '}
+              <span className="font-semibold text-gray-900">#eb282d</span> sebagai warna interactive/action, dan{' '}
               <span className="font-semibold text-gray-900">#D3B973</span> sebagai aksen premium.
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-              <div className="rounded-lg p-3 bg-[#231043] text-white shadow-xs">
+              <div className="rounded-lg p-3 bg-[#680a0d] text-white shadow-xs">
                 <div className="text-xs opacity-75 font-mono">Primary 900</div>
-                <div className="text-sm font-bold mt-4 font-mono">#231043</div>
+                <div className="text-sm font-bold mt-4 font-mono">#680a0d</div>
                 <div className="text-[11px] opacity-75 mt-0.5">Brand Identity</div>
               </div>
-              <div className="rounded-lg p-3 bg-[#231034] text-white shadow-xs">
+              <div className="rounded-lg p-3 bg-[#9e1317] text-white shadow-xs">
                 <div className="text-xs opacity-75 font-mono">Primary 800</div>
-                <div className="text-sm font-bold mt-4 font-mono">#231034</div>
+                <div className="text-sm font-bold mt-4 font-mono">#9e1317</div>
                 <div className="text-[11px] opacity-75 mt-0.5">Dark Brand</div>
               </div>
-              <div className="rounded-lg p-3 bg-[#3B176D] text-white shadow-xs">
+              <div className="rounded-lg p-3 bg-[#c81e22] text-white shadow-xs">
                 <div className="text-xs opacity-75 font-mono">Primary 700</div>
-                <div className="text-sm font-bold mt-4 font-mono">#3B176D</div>
-                <div className="text-[11px] opacity-75 mt-0.5">Dark Purple</div>
+                <div className="text-sm font-bold mt-4 font-mono">#c81e22</div>
+                <div className="text-[11px] opacity-75 mt-0.5">Dark Red</div>
               </div>
-              <div className="rounded-lg p-3 bg-[#6D28D9] text-white shadow-xs ring-2 ring-primary-600 ring-offset-2">
+              <div className="rounded-lg p-3 bg-[#eb282d] text-white shadow-xs ring-2 ring-primary-600 ring-offset-2">
                 <div className="text-xs opacity-75 font-mono">Primary 600</div>
-                <div className="text-sm font-bold mt-4 font-mono">#6D28D9</div>
+                <div className="text-sm font-bold mt-4 font-mono">#eb282d</div>
                 <div className="text-[11px] opacity-75 mt-0.5">Primary Action ★</div>
               </div>
-              <div className="rounded-lg p-3 bg-[#7C3AED] text-white shadow-xs">
+              <div className="rounded-lg p-3 bg-[#f04a4e] text-white shadow-xs">
                 <div className="text-xs opacity-75 font-mono">Primary 500</div>
-                <div className="text-sm font-bold mt-4 font-mono">#7C3AED</div>
+                <div className="text-sm font-bold mt-4 font-mono">#f04a4e</div>
                 <div className="text-[11px] opacity-75 mt-0.5">Highlight</div>
               </div>
-              <div className="rounded-lg p-3 bg-[#EDE9FE] text-primary-900 border border-purple-200">
+              <div className="rounded-lg p-3 bg-[#fee2e2] text-primary-900 border border-red-200">
                 <div className="text-xs text-primary-700 font-mono">Primary 100</div>
-                <div className="text-sm font-bold mt-4 font-mono">#EDE9FE</div>
+                <div className="text-sm font-bold mt-4 font-mono">#fee2e2</div>
                 <div className="text-[11px] text-primary-700 mt-0.5">Light Focus Ring</div>
               </div>
-              <div className="rounded-lg p-3 bg-[#F5F3FF] text-primary-900 border border-purple-100">
+              <div className="rounded-lg p-3 bg-[#fef2f2] text-primary-900 border border-red-100">
                 <div className="text-xs text-primary-700 font-mono">Primary 50</div>
-                <div className="text-sm font-bold mt-4 font-mono">#F5F3FF</div>
+                <div className="text-sm font-bold mt-4 font-mono">#fef2f2</div>
                 <div className="text-[11px] text-primary-700 mt-0.5">Subtle Bg</div>
               </div>
             </div>

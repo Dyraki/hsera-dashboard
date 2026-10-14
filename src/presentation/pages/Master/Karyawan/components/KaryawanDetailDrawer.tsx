@@ -17,7 +17,7 @@ export const KaryawanDetailDrawer: React.FC<KaryawanDetailDrawerProps> = ({ isOp
   <SlideOver isOpen={isOpen} onClose={onClose} title={employee ? `${employee.legalName} (${employee.employeeNumber})` : 'Detail'}>
     {employee && <div className="p-5 sm:p-6 space-y-6">
       <div className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-600 to-indigo-600 flex items-center justify-center text-white font-extrabold text-lg uppercase shadow-sm">{employee.legalName.substring(0, 2)}</div>
+        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-600 to-red-700 flex items-center justify-center text-white font-extrabold text-lg uppercase shadow-sm">{employee.legalName.substring(0, 2)}</div>
         <div>
           <h3 className="font-bold text-gray-950 text-base leading-tight">{employee.legalName}</h3>
           <span className="text-caption text-primary-700 font-mono font-medium block mt-0.5">{employee.employeeNumber} • NIK: {employee.nik}</span>

@@ -31,15 +31,35 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      {toast && <div className="fixed right-4 top-4 z-[100] w-[min(28rem,calc(100vw-2rem))]" role="status" aria-live="polite">
-        <div className={`flex items-start gap-3 rounded-lg border bg-white p-4 shadow-lg ${toast.kind === 'success' ? 'border-success-200' : 'border-error-200'}`}>
-          {toast.kind === 'success' ? <CheckCircle2 className="mt-0.5 shrink-0 text-success-600" size={18} /> : <AlertCircle className="mt-0.5 shrink-0 text-error-600" size={18} />}
-          <p className={`min-w-0 flex-1 text-sm ${toast.kind === 'success' ? 'text-success-700' : 'text-error-700'}`}>{toast.message}</p>
-          <button type="button" onClick={() => setToast(null)} className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900" aria-label="Tutup notifikasi">
-            <X size={15} />
-          </button>
+      {toast && (
+        <div className="fixed right-5 top-5 z-[100] w-[min(26rem,calc(100vw-2.5rem))] animate-in slide-in-from-top-3 fade-in duration-200" role="status" aria-live="polite">
+          <div className={`flex items-start gap-3 rounded-xl border bg-white p-4 shadow-xl ${toast.kind === 'success' ? 'border-success-200 shadow-success-500/10' : 'border-error-200 shadow-error-500/10'}`}>
+            <div className={`rounded-lg p-1.5 shrink-0 ${toast.kind === 'success' ? 'bg-success-50 text-success-600' : 'bg-error-50 text-error-600'}`}>
+              {toast.kind === 'success' ? (
+                <CheckCircle2 size={18} />
+              ) : (
+                <AlertCircle size={18} />
+              )}
+            </div>
+            <div className="min-w-0 flex-1 pt-0.5">
+              <h4 className="text-xs font-bold text-gray-900 tracking-wide uppercase">
+                {toast.kind === 'success' ? 'Berhasil' : 'Pemberitahuan'}
+              </h4>
+              <p className="text-xs text-gray-700 mt-0.5 leading-relaxed font-medium">
+                {toast.message}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setToast(null)}
+              className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors shrink-0"
+              aria-label="Tutup notifikasi"
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
-      </div>}
+      )}
     </ToastContext.Provider>
   );
 };

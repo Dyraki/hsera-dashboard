@@ -2,35 +2,26 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
   Bell,
-  Menu as MenuIcon,
   ChevronDown,
   LogOut,
   Building2
 } from 'lucide-react';
 
 interface HeaderProps {
-  sidebarOpen: boolean;
-  setSidebarOpen: (open: boolean) => void;
+  sidebarOpen?: boolean;
+  setSidebarOpen?: (open: boolean) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ sidebarOpen, setSidebarOpen }) => {
+export const Header: React.FC<HeaderProps> = () => {
   const { user, logout } = useAuth();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 sticky top-0 z-45 flex items-center justify-between px-6 lg:px-8 shadow-xs">
+    <header className="h-16 shrink-0 bg-white border-b border-gray-200 sticky top-0 z-30 flex items-center justify-between px-6 lg:px-8 shadow-xs">
       
-      {/* Header Left (Sidebar Toggle) */}
-      <div className="flex items-center gap-4 flex-1">
-        {/* Toggle Button for mobile */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-500 lg:hidden"
-        >
-          <MenuIcon size={18} />
-        </button>
-
+      {/* Header Left */}
+      <div className="flex items-center gap-3">
       </div>
 
       {/* Header Right (Actions & Avatar) */}

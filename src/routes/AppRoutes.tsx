@@ -15,6 +15,10 @@ const RoleFormPage = lazy(() => import('../presentation/pages/Settings/Role/Role
 const RoleUserPage = lazy(() => import('../presentation/pages/Settings/RoleUser/RoleUserPage').then((module) => ({ default: module.RoleUserPage })));
 const OperationUnitListPage = lazy(() => import('../presentation/pages/Master/OperationUnit/OperationUnitListPage').then((module) => ({ default: module.OperationUnitListPage })));
 const KaryawanListPage = lazy(() => import('../presentation/pages/Master/Karyawan/KaryawanListPage').then((module) => ({ default: module.KaryawanListPage })));
+const TerritoryListPage = lazy(() => import('../presentation/pages/Salesmanship/Territory').then((module) => ({ default: module.TerritoryListPage })));
+const TargetListPage = lazy(() => import('../presentation/pages/Salesmanship/Target').then((module) => ({ default: module.TargetListPage })));
+const CallsheetFormPage = lazy(() => import('../presentation/pages/Salesmanship/Callsheet').then((module) => ({ default: module.CallsheetFormPage })));
+const MonitoringPage = lazy(() => import('../presentation/pages/Salesmanship/Monitoring').then((module) => ({ default: module.MonitoringPage })));
 const DesignSystemShowcasePage = lazy(() => import('../presentation/pages/DesignSystem/DesignSystemShowcasePage').then((module) => ({ default: module.DesignSystemShowcasePage })));
 
 const protectedElement = (menuId: string, minLevel: number, page: React.ReactNode) => (
@@ -37,6 +41,12 @@ export const AppRoutes: React.FC = () => (
       <Route path={routePaths.roleUsersAlias} element={protectedElement(SYSTEM_MENU_IDS.ROLE_USER, 1, <RoleUserPage />)} />
       <Route path={routePaths.operationUnits} element={protectedElement(SYSTEM_MENU_IDS.OPERATION_UNIT, 1, <OperationUnitListPage />)} />
       <Route path={routePaths.karyawan} element={protectedElement(SYSTEM_MENU_IDS.KARYAWAN, 1, <KaryawanListPage />)} />
+      <Route path={routePaths.salesmanshipTerritory} element={protectedElement(SYSTEM_MENU_IDS.TERITORY_MANAGEMENT, 1, <TerritoryListPage />)} />
+      <Route path={routePaths.salesmanshipTarget} element={protectedElement(SYSTEM_MENU_IDS.SETUP_TARGET, 1, <TargetListPage />)} />
+      <Route path={routePaths.salesmanshipCallsheet} element={protectedElement(SYSTEM_MENU_IDS.FORM_CALLSHEET, 1, <CallsheetFormPage />)} />
+      <Route path={routePaths.salesmanshipMonitoring} element={protectedElement(SYSTEM_MENU_IDS.MONITORING_CALLSHEET, 1, <MonitoringPage />)} />
+      <Route path={routePaths.comingSoon} element={<ComingSoonPage />} />
+      <Route path={routePaths.comingSoonSystem} element={<ComingSoonPage />} />
       {import.meta.env.DEV && <Route path={routePaths.designSystem} element={protectedElement(SYSTEM_MENU_IDS.DASHBOARD, 1, <DesignSystemShowcasePage />)} />}
       <Route path={routePaths.fallback} element={<ComingSoonPage />} />
     </Routes>

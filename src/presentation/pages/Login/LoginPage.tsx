@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLoginController } from './useLoginController';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import hseraLogo from '@/presentation/assets/images/hsera-logo.png';
 
 export const LoginPage: React.FC = () => {
   const {
@@ -16,91 +17,48 @@ export const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#231043] font-sans selection:bg-purple-500 selection:text-white">
-      {/* LEFT SECTION: Promotional Hero Banner (#231043) */}
-      <div
-        className="relative w-full md:w-[50%] lg:w-[54%] min-h-[420px] md:min-h-screen flex flex-col justify-between p-8 sm:p-12 lg:p-20 overflow-hidden text-white shrink-0"
-        style={{
-          background: 'radial-gradient(circle at 35% 35%, #38186a 0%, #231043 65%, #180930 100%)',
-        }}
-      >
-        {/* Background Decorative Curved Geometric Lines */}
-        <svg
-          className="absolute -right-20 -top-20 w-[140%] h-[140%] pointer-events-none opacity-25"
-          viewBox="0 0 800 1000"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M 50 150 C 350 200, 650 450, 700 950"
-            stroke="white"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M 120 180 C 400 240, 700 480, 740 980"
-            stroke="white"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M 190 210 C 450 280, 750 510, 780 1010"
-            stroke="white"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M 260 240 C 500 320, 800 540, 820 1040"
-            stroke="white"
-            strokeWidth="1.5"
-          />
-        </svg>
+    <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#eb282d] font-sans selection:bg-[#eb282d] selection:text-white">
+      {/* LEFT SECTION: Flat Red Hero Banner (#eb282d) */}
+      <div className="relative w-full md:w-[50%] lg:w-[54%] min-h-[420px] md:min-h-screen bg-[#eb282d] flex flex-col justify-between p-8 sm:p-12 lg:p-20 text-white shrink-0">
+        {/* Top spacer */}
+        <div className="hidden md:block"></div>
 
-        {/* Top: Starburst Asterisk Icon */}
-        <div className="relative z-10">
-          <div className="inline-flex items-center justify-center mb-8">
-            <svg
-              width="56"
-              height="56"
-              viewBox="0 0 64 64"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-white drop-shadow-md"
-            >
-              <path
-                d="M32 6V58M6 32H58M13.6 13.6L50.4 50.4M13.6 50.4L50.4 13.6"
-                stroke="currentColor"
-                strokeWidth="6.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-
-          {/* Heading */}
-          <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-              Hello
-              <br />
-              Framework!
+        {/* Center: Brand Logo & Centered Typography */}
+        <div className="relative z-10 flex flex-col items-center justify-center text-center my-auto py-8">
+          {/* Centered Heading & Subtitle */}
+          <div className="space-y-4 max-w-xl mx-auto text-center">
+            <h1 className="tracking-tight text-white leading-tight">
+              <span className="block text-6xl sm:text-7xl lg:text-8xl font-black">
+                Hello.
+              </span>
+              <span className="block text-4xl sm:text-5xl lg:text-6xl font-extrabold mt-2 text-white">
+                AO Tulungagung
+              </span>
             </h1>
-            <p className="text-sm sm:text-base text-purple-200/85 font-normal leading-relaxed max-w-md pt-4">
-              Skip repetitive and manual administrative tasks. Get highly productive through automation
-              and save tons of time!
+            <p className="text-sm sm:text-base lg:text-lg text-white/90 font-normal leading-relaxed max-w-md mx-auto pt-2">
+              kami tidak membuat administrasi jadi sedikit lebih cepat, kami membuatnya hilang dari daftar pekerjaan!!
             </p>
           </div>
         </div>
 
-        {/* Bottom: Copyright */}
-        <div className="relative z-10 pt-10">
-          <p className="text-xs text-purple-300/60 font-medium">
-            © 2026 Framework App. All rights reserved.
+        {/* Bottom: Copyright Centered */}
+        <div className="relative z-10 pt-8 text-center">
+          <p className="text-xs text-white/75 font-medium">
+            © 2026 AO Tulungagung. All rights reserved.
           </p>
         </div>
       </div>
 
       {/* RIGHT SECTION: White Login Card (#FFFFFF) */}
-      <div className="relative w-full md:w-[50%] lg:w-[46%] min-h-screen bg-white flex flex-col justify-between p-8 sm:p-12 lg:p-20 shadow-2xl md:shadow-[-25px_0_50px_rgba(0,0,0,0.18)] z-20">
+      <div className="relative w-full md:w-[50%] lg:w-[46%] min-h-screen bg-white flex flex-col justify-between p-8 sm:p-6 lg:p-6 border-l border-slate-100 z-20">
         {/* Brand Header */}
-        <div className="flex items-center justify-between">
-          <div className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
-            Framework
+        <div className="flex items-center gap-3">
+          <img
+            src={hseraLogo}
+            alt="HSERA Logo"
+            className="w-24 h-24 sm:w-32 sm:h-32 object-contain select-none"
+          />
+          <div className="text-xl sm:text-3xl font-black tracking-tight text-slate-900">
           </div>
         </div>
 
@@ -112,7 +70,7 @@ export const LoginPage: React.FC = () => {
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-2">
               Don't have an account?{' '}
-              <span className="font-semibold text-slate-800 underline cursor-pointer hover:text-purple-900">
+              <span className="font-semibold text-slate-800 underline cursor-pointer hover:text-primary-600">
                 Contact administrator
               </span>{' '}
               to get access.
@@ -215,7 +173,7 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => alert('Silakan hubungi Super Admin untuk mereset kata sandi Anda.')}
-                  className="font-semibold text-slate-800 underline hover:text-purple-900 transition-colors"
+                  className="font-semibold text-slate-800 underline hover:text-primary-600 transition-colors"
                 >
                   Click here
                 </button>

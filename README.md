@@ -64,8 +64,8 @@ Aplikasi frontend menerapkan pondasi desain sistem standar yang konsisten di sel
 ### A. Brand Colors
 | Token Name | Hex Code | Utility Class | Penggunaan |
 | :--- | :--- | :--- | :--- |
-| **Brand Purple Dark** | `#231043` | `bg-brand-purple`, `text-brand-purple` | Warna primer utama, hero promosi, sidebar gelap |
-| **Brand Purple Vibrant** | `#6D28D9` | `bg-brand-purple-vibrant` | Aksen tombol aktif, highlight, fokus interaktif |
+| **Brand Red Dark** | `#680a0d` | `bg-brand-red`, `text-brand-red` | Warna primer utama, hero promosi, sidebar gelap |
+| **Brand Red Vibrant** | `#eb282d` | `bg-brand-red-vibrant`, `bg-primary-600` | Aksen tombol aktif, highlight, fokus interaktif |
 | **Brand Gold** | `#D3B973` | `bg-brand-gold`, `text-brand-gold` | Aksen lencana premium, bintang, garis pembatas emas |
 
 ### B. Semantic Colors

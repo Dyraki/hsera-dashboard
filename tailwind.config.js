@@ -9,14 +9,14 @@ export default {
       colors: {
         // 1. BRAND COLORS
         primary: {
-          900: '#231043', // dark purple / brand identity
-          800: '#231034', // dark brand
-          700: '#3B176D', // dark purple
-          600: '#6D28D9', // primary interactive / action
-          500: '#7C3AED', // highlight
-          100: '#EDE9FE', // light purple background
-          50: '#F5F3FF',  // very light purple background
-          DEFAULT: '#6D28D9',
+          900: '#680a0d', // dark red / brand identity
+          800: '#9e1317', // dark brand
+          700: '#c81e22', // dark red
+          600: '#eb282d', // primary interactive / action
+          500: '#f04a4e', // highlight
+          100: '#fee2e2', // light red background
+          50: '#fef2f2',  // very light red background
+          DEFAULT: '#eb282d',
         },
         gold: {
           600: '#B89B4A', // premium accent
@@ -25,39 +25,51 @@ export default {
           DEFAULT: '#D3B973',
         },
         brand: {
-          purple: '#231043',
-          'purple-vibrant': '#6D28D9',
+          red: '#680a0d',
+          'red-vibrant': '#eb282d',
+          purple: '#680a0d',
+          'purple-vibrant': '#eb282d',
           gold: '#D3B973',
         },
-        'brand-purple': '#231043',
-        'brand-purple-vibrant': '#6D28D9',
+        'brand-red': '#680a0d',
+        'brand-red-vibrant': '#eb282d',
+        'brand-purple': '#680a0d',
+        'brand-purple-vibrant': '#eb282d',
         'brand-gold': '#D3B973',
 
         // 2. SEMANTIC COLORS
         success: {
-          600: '#15803D',
-          500: '#16A34A',
+          700: '#15803D',
+          600: '#16A34A',
+          500: '#22C55E',
+          200: '#BBF7D0',
           100: '#DCFCE7',
           50: '#F0FDF4',
           DEFAULT: '#16A34A',
         },
         warning: {
-          600: '#B45309',
+          700: '#B45309',
+          600: '#D97706',
           500: '#F59E0B',
+          200: '#FDE68A',
           100: '#FEF3C7',
           50: '#FFFBEB',
           DEFAULT: '#F59E0B',
         },
         error: {
-          600: '#B91C1C',
-          500: '#DC2626',
+          700: '#B91C1C',
+          600: '#DC2626',
+          500: '#EF4444',
+          200: '#FECACA',
           100: '#FEE2E2',
           50: '#FEF2F2',
           DEFAULT: '#DC2626',
         },
         info: {
-          600: '#0369A1',
-          500: '#0284C7',
+          700: '#0369A1',
+          600: '#0284C7',
+          500: '#0EA5E9',
+          200: '#BAE6FD',
           100: '#E0F2FE',
           50: '#F0F9FF',
           DEFAULT: '#0284C7',

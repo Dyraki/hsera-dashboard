@@ -62,7 +62,7 @@ export const KaryawanTable: React.FC<KaryawanTableProps> = ({
             <tr key={employee.id} className="hover:bg-gray-50 transition-colors">
               <td className="py-3.5 px-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs uppercase shrink-0 shadow-xs">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-600 to-red-700 flex items-center justify-center text-white font-bold text-xs uppercase shrink-0 shadow-xs">
                     {employee.legalName.substring(0, 2)}
                   </div>
                   <div className="min-w-0">

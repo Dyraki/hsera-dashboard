@@ -47,7 +47,7 @@ export const Button: React.FC<ButtonProps> = ({
   // Guaranteed fallback style to ensure button colors always render
   const guaranteedStyle: React.CSSProperties = { ...style };
   if (variant === 'primary') {
-    if (!guaranteedStyle.backgroundColor) guaranteedStyle.backgroundColor = '#6D28D9';
+    if (!guaranteedStyle.backgroundColor) guaranteedStyle.backgroundColor = '#eb282d';
     if (!guaranteedStyle.color) guaranteedStyle.color = '#FFFFFF';
   } else if (variant === 'secondary') {
     if (!guaranteedStyle.backgroundColor) guaranteedStyle.backgroundColor = '#F3F4F6';

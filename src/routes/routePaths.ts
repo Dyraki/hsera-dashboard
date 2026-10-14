@@ -12,6 +12,12 @@ export const routePaths = {
   roleUsersAlias: '/settings/role-user',
   operationUnits: '/master/operation-unit',
   karyawan: '/master/karyawan',
+  salesmanshipTerritory: '/salesmanship/territory',
+  salesmanshipTarget: '/salesmanship/target',
+  salesmanshipCallsheet: '/salesmanship/callsheet',
+  salesmanshipMonitoring: '/salesmanship/monitoring',
+  comingSoon: '/coming-soon',
+  comingSoonSystem: '/system/coming-soon',
   designSystem: '/design-system',
   fallback: '/*'
 } as const;

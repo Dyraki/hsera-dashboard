@@ -20,11 +20,17 @@ export const ComingSoonPage: React.FC = () => {
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Halaman Sedang Dalam Pengembangan</h2>
         <p className="text-gray-500 max-w-md mb-6 text-body-sm">
-          Menu ini mengarah ke rute{' '}
-          <code className="bg-gray-100 text-primary-600 px-2 py-0.5 rounded font-mono text-caption font-semibold">
-            /{normalized}
-          </code>
-          , namun komponen halaman untuk rute ini belum dibuat.
+          {normalized && normalized !== 'coming-soon' && normalized !== 'system/coming-soon' ? (
+            <>
+              Menu ini mengarah ke rute{' '}
+              <code className="bg-gray-100 text-primary-600 px-2 py-0.5 rounded font-mono text-caption font-semibold">
+                /{normalized}
+              </code>
+              , namun komponen halaman untuk rute ini belum dibuat.
+            </>
+          ) : (
+            'Menu ini sedang dalam tahap pengembangan dan akan segera tersedia.'
+          )}
         </p>
         <Button
           variant="primary"

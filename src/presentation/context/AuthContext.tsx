@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const hasPermission = (menuId: string, minLevel: number): boolean => {
-    if (user?.jenis === 'SA' || user?.jenis === 'admin' || user?.username === 'admin') {
+    if (user?.jenis === 'SA' || user?.jenis === 'admin' || user?.username === 'admin' || user?.scope?.isSuperAdmin) {
       return true;
     }
     const perm = permissions.find((p) => String(p.menuId) === String(menuId));
