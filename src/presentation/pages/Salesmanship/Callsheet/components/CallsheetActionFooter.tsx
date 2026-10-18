@@ -17,7 +17,7 @@ export const CallsheetActionFooter: React.FC<CallsheetActionFooterProps> = ({
   disabled = false,
 }) => {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-6 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl shadow-md sticky bottom-4 z-20">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-6 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl shadow-md sticky bottom-0 z-20">
       <div>
         <button
           type="button"

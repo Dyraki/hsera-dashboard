@@ -168,6 +168,9 @@ export const MonitoringWeekFilter: React.FC<MonitoringWeekFilterProps> = ({
             className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer"
           >
             <option value="all">Semua Cabang (OU)</option>
+            {filters.ouKode !== "all" && !operationUnits.some((ou) => ou.kode === filters.ouKode) && (
+              <option value={filters.ouKode}>{filters.ouKode}</option>
+            )}
             {operationUnits.map((ou) => (
               <option key={ou.id} value={ou.kode}>
                 {ou.kode} – {ou.nama}

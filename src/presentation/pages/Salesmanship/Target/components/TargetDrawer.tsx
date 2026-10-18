@@ -125,7 +125,7 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
           onChange={(e) => onChange({ ...formData, hariKunjungan: e.target.value })}
           options={HARI_KUNJUNGAN_OPTIONS}
           disabled={isSubmitting}
-          helperText="Pilih hari tertentu jika target hanya berlaku pada hari tersebut, atau 'Semua Hari'."
+          helperText="Pilih hari tertentu jika target hanya berlaku pada hari tersebut, 'Senin - Jumat', atau 'Semua Hari'."
         />
 
         {/* Nilai Target */}

@@ -29,6 +29,12 @@ const formatShortDate = (isoDate?: string): string => {
   return `${parseInt(parts[2], 10)}/${parseInt(parts[1], 10)}`;
 };
 
+const getKpiPillColor = (percent: number): string => {
+  if (percent >= 100) return "bg-emerald-50 text-emerald-700 border-emerald-200";
+  if (percent >= 75) return "bg-amber-50 text-amber-700 border-amber-200";
+  return "bg-rose-50 text-rose-700 border-rose-200";
+};
+
 export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
   districts,
   isLoading = false,
@@ -91,6 +97,22 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
     let grandEc = 0;
     let grandVol = 0;
 
+    let grandTargetCm = 0;
+    let grandTargetEc = 0;
+    let grandTargetBd = 0;
+    let grandTargetVol = 0;
+    let sumOverallScore = 0;
+
+    districts.forEach((dist) => {
+      if (dist.kpiAchievement) {
+        grandTargetCm += dist.kpiAchievement.target.kunjungan;
+        grandTargetEc += dist.kpiAchievement.target.ec;
+        grandTargetBd += dist.kpiAchievement.target.bd;
+        grandTargetVol += dist.kpiAchievement.target.volume;
+        sumOverallScore += dist.kpiAchievement.percent.overall;
+      }
+    });
+
     dayColumnTotals.forEach((col) => {
       totalTerisi += col.terisiCount;
       grandCm += col.totalCm;
@@ -99,16 +121,23 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
       grandVol += col.totalVolume;
     });
 
-    const avgPersen = totalSlot > 0 ? Math.round((totalTerisi / totalSlot) * 100) : 0;
+    const avgPersenHari = totalSlot > 0 ? Math.round((totalTerisi / totalSlot) * 100) : 0;
+    const avgOverallAchievement =
+      districts.length > 0 ? Math.round(sumOverallScore / districts.length) : avgPersenHari;
 
     return {
       totalSlot,
       totalTerisi,
-      avgPersen,
+      avgPersenHari,
+      avgOverallAchievement,
       grandCm,
       grandBd,
       grandEc,
       grandVol,
+      grandTargetCm,
+      grandTargetEc,
+      grandTargetBd,
+      grandTargetVol,
     };
   }, [districts, dayColumnTotals]);
 
@@ -161,32 +190,34 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
                   )}
                 </th>
               ))}
-              <th className="py-3 px-4 font-bold text-center text-gray-900 w-36">
+              <th className="py-3 px-4 font-bold text-center text-gray-900 w-48 min-w-[175px]">
                 Pencapaian Minggu
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 text-xs">
             {districts.map((dist) => {
-              const is100Percent = dist.persentaseLengkap === 100;
-              const isLowPercent = dist.persentaseLengkap < 50;
+              const ach = dist.kpiAchievement;
+              const overallPercent = ach ? ach.percent.overall : dist.persentaseLengkap;
+              const isHighAch = overallPercent >= 100;
+              const isMediumAch = overallPercent >= 75 && overallPercent < 100;
 
               return (
                 <tr key={dist.districtId} className="hover:bg-gray-50/70 transition-colors">
                   {/* District / Salesman Info */}
                   <td className="py-3 px-4 sticky left-0 bg-white hover:bg-gray-50/70 z-10 border-r border-gray-200 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.05)]">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="font-bold text-gray-900 text-xs tracking-tight">
-                          {dist.districtKode}
-                        </div>
-                        <div className="text-[11px] text-gray-600 truncate max-w-[150px]" title={dist.karyawanName}>
-                          {dist.karyawanName}
-                        </div>
+                    <div>
+                      <div className="font-bold text-gray-900 text-xs tracking-tight">
+                        {dist.districtKode}
                       </div>
-                      <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-bold rounded bg-gray-100 text-gray-700 border border-gray-200">
-                        {dist.ouKode}
-                      </span>
+                      <div className="text-[11px] text-gray-600 truncate max-w-[170px]" title={dist.karyawanName}>
+                        {dist.karyawanName}
+                      </div>
+                      <div className="mt-1">
+                        <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded bg-gray-100 text-gray-700 border border-gray-200">
+                          {dist.ouKode}
+                        </span>
+                      </div>
                     </div>
                   </td>
 
@@ -298,33 +329,92 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
                     );
                   })}
 
-                  {/* Weekly Completion Ratio & Percentage */}
-                  <td className="py-3 px-4 text-center">
+                  {/* Weekly Achievement (Target vs Actual) & Completion */}
+                  <td className="py-2.5 px-3 text-center min-w-[170px]">
+                    {/* Main Overall Achievement Badge */}
                     <div className="inline-flex items-center gap-1.5">
                       <span
-                        className={`px-2 py-0.5 text-xs font-extrabold rounded-md border ${
-                          is100Percent
+                        className={`px-2.5 py-0.5 text-xs font-black rounded-md border shadow-xs ${
+                          isHighAch
                             ? "bg-emerald-50 text-emerald-700 border-emerald-300"
-                            : isLowPercent
-                            ? "bg-rose-50 text-rose-700 border-rose-300"
-                            : "bg-amber-50 text-amber-700 border-amber-300"
+                            : isMediumAch
+                            ? "bg-amber-50 text-amber-700 border-amber-300"
+                            : "bg-rose-50 text-rose-700 border-rose-300"
                         }`}
+                        title={
+                          ach
+                            ? `Pencapaian Minggu (Rata-rata Capped Standar Industri): ${overallPercent}%\n` +
+                              `• Kunjungan (CM): ${ach.actual.kunjungan} / ${ach.target.kunjungan} (${ach.percent.kunjungan}%)\n` +
+                              `• Effective Call (EC): ${ach.actual.ec} / ${ach.target.ec} (${ach.percent.ec}%)\n` +
+                              `• BD Outlet: ${ach.actual.bd} / ${ach.target.bd} (${ach.percent.bd}%)\n` +
+                              `• Volume GG: ${ach.actual.volume} / ${ach.target.volume || "-"} Pk (${ach.percent.volume}%)`
+                            : undefined
+                        }
                       >
-                        {dist.persentaseLengkap}%
+                        {overallPercent}%
                       </span>
-                    </div>
-                    <div className="text-[11px] text-gray-500 mt-1 font-medium">
-                      {dist.totalHariTerisi} / 6 Hari
                     </div>
 
                     {/* Mini Visual Bar */}
-                    <div className="w-20 bg-gray-200 rounded-full h-1.5 mx-auto mt-1.5 overflow-hidden">
+                    <div className="w-24 bg-gray-200 rounded-full h-1.5 mx-auto mt-1.5 overflow-hidden">
                       <div
-                        className={`h-1.5 rounded-full ${
-                          is100Percent ? "bg-emerald-500" : isLowPercent ? "bg-rose-500" : "bg-amber-500"
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          isHighAch ? "bg-emerald-500" : isMediumAch ? "bg-amber-500" : "bg-rose-500"
                         }`}
-                        style={{ width: `${dist.persentaseLengkap}%` }}
+                        style={{ width: `${Math.min(100, overallPercent)}%` }}
                       />
+                    </div>
+
+                    {/* 2x2 Sub-metrics Pills for 4 KPIs */}
+                    {ach ? (
+                      <div className="grid grid-cols-2 gap-1 mt-2 text-[10px]">
+                        <div
+                          className={`px-1 py-0.5 rounded border font-medium truncate cursor-help ${getKpiPillColor(
+                            ach.percent.kunjungan
+                          )}`}
+                          title={`Kunjungan (CM): Realisasi ${ach.actual.kunjungan} dari Target ${ach.target.kunjungan} (${ach.percent.kunjungan}%)`}
+                        >
+                          CM: <span className="font-bold">{ach.percent.kunjungan}%</span>
+                        </div>
+                        <div
+                          className={`px-1 py-0.5 rounded border font-medium truncate cursor-help ${getKpiPillColor(
+                            ach.percent.ec
+                          )}`}
+                          title={`Effective Call (EC): Realisasi ${ach.actual.ec} dari Target ${ach.target.ec} (${ach.percent.ec}%)`}
+                        >
+                          EC: <span className="font-bold">{ach.percent.ec}%</span>
+                        </div>
+                        <div
+                          className={`px-1 py-0.5 rounded border font-medium truncate cursor-help ${getKpiPillColor(
+                            ach.percent.bd
+                          )}`}
+                          title={`BD Outlet: Realisasi ${ach.actual.bd} dari Target ${ach.target.bd} (${ach.percent.bd}%)`}
+                        >
+                          BD: <span className="font-bold">{ach.percent.bd}%</span>
+                        </div>
+                        <div
+                          className={`px-1 py-0.5 rounded border font-medium truncate cursor-help ${
+                            ach.target.volume > 0
+                              ? getKpiPillColor(ach.percent.volume)
+                              : "bg-gray-50 text-gray-600 border-gray-200"
+                          }`}
+                          title={
+                            ach.target.volume > 0
+                              ? `Volume GG: Realisasi ${ach.actual.volume} dari Target ${ach.target.volume} Pk (${ach.percent.volume}%)`
+                              : `Volume GG: Realisasi ${ach.actual.volume} Pk (Target belum diset)`
+                          }
+                        >
+                          Vol:{" "}
+                          <span className="font-bold">
+                            {ach.target.volume > 0 ? `${ach.percent.volume}%` : `${ach.actual.volume} Pk`}
+                          </span>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {/* Subtext Keterisian Hari */}
+                    <div className="text-[10px] text-gray-500 mt-1 font-medium">
+                      {dist.totalHariTerisi} / 6 Hari Terisi
                     </div>
                   </td>
                 </tr>
@@ -354,12 +444,15 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
                 </td>
               ))}
 
-              <td className="py-3 px-4 text-center">
-                <div className="text-xs font-extrabold text-primary-700">
-                  {grandTotalSummary.avgPersen}%
+              <td className="py-3 px-3 text-center min-w-[170px]">
+                <div className="text-xs font-black text-primary-700">
+                  {grandTotalSummary.avgOverallAchievement}%
                 </div>
-                <div className="text-[10px] text-gray-600">
-                  {grandTotalSummary.totalTerisi} / {grandTotalSummary.totalSlot} slot
+                <div className="text-[10px] text-gray-700 font-semibold mt-0.5">
+                  Rata-rata Pencapaian
+                </div>
+                <div className="text-[9px] text-gray-500 mt-0.5">
+                  {grandTotalSummary.totalTerisi} / {grandTotalSummary.totalSlot} slot terisi ({grandTotalSummary.avgPersenHari}%)
                 </div>
               </td>
             </tr>
@@ -392,7 +485,7 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
         </div>
 
         <div className="text-gray-500 text-[11px]">
-          <strong>CM:</strong> Callmade (Kunjungan) · <strong>BD:</strong> BD Outlet · <strong>EC:</strong> Effective Call · <strong>Pk:</strong> Pack
+          <strong>CM:</strong> Callmade (Kunjungan) · <strong>BD:</strong> BD Outlet · <strong>EC:</strong> Effective Call · <strong>Vol:</strong> Volume (Pack)
         </div>
       </div>
     </div>

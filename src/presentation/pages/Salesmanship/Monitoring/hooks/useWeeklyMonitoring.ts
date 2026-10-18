@@ -3,6 +3,7 @@ import { WeeklyMonitoringResponse } from "@/core/domain/models/Monitoring";
 import { OperationUnitOption } from "@/core/domain/models/District";
 import { salesmanshipRepository } from "@/core/di/container";
 import { useToast } from "@/presentation/context/ToastContext";
+import { useAuth } from "@/presentation/context/AuthContext";
 import { ViewMode, MonitoringKpiSummary, FilterState } from "../types";
 
 // Helper to calculate ISO Week number for a Date
@@ -22,6 +23,9 @@ export const getIsoWeekNumber = (d: Date): number => {
 
 export const useWeeklyMonitoring = () => {
   const { showToast } = useToast();
+  const { user } = useAuth();
+
+  const userOuKode = user?.scope?.unitCode;
 
   const [currentIsoWeek] = useState<number>(() => getIsoWeekNumber(new Date()));
   const [selectedWeek, setSelectedWeek] = useState<number>(() => getIsoWeekNumber(new Date()));
@@ -31,26 +35,51 @@ export const useWeeklyMonitoring = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [operationUnits, setOperationUnits] = useState<OperationUnitOption[]>([]);
-  const [filters, setFilters] = useState<FilterState>({
-    ouKode: "all",
+  const [filters, setFilters] = useState<FilterState>(() => ({
+    ouKode: userOuKode || "all",
     status: "ALL",
     search: "",
-  });
+  }));
   const [viewMode, setViewMode] = useState<ViewMode>("RINGKAS");
 
   const [isLockModalOpen, setIsLockModalOpen] = useState<boolean>(false);
   const [isSubmittingLock, setIsSubmittingLock] = useState<boolean>(false);
 
-  // Load Operation Units reference on mount
+  // Sync initial ouKode if user context arrives after component mount
+  useEffect(() => {
+    if (userOuKode) {
+      setFilters((prev) => {
+        if (prev.ouKode === "all") {
+          return { ...prev, ouKode: userOuKode };
+        }
+        return prev;
+      });
+    }
+  }, [userOuKode]);
+
+  // Load Operation Units reference on mount and match user's OU if needed
   useEffect(() => {
     let mounted = true;
     salesmanshipRepository.getOperationUnits()
       .then((ous) => {
-        if (mounted) setOperationUnits(ous);
+        if (mounted) {
+          setOperationUnits(ous);
+          setFilters((prev) => {
+            if (prev.ouKode === "all") {
+              const matchedOu = user?.scope?.unitCode
+                ? ous.find((ou) => ou.kode === user.scope?.unitCode)
+                : ous.find((ou) => ou.id === user?.karyawan?.operationUnitId);
+              if (matchedOu) {
+                return { ...prev, ouKode: matchedOu.kode };
+              }
+            }
+            return prev;
+          });
+        }
       })
       .catch((err) => console.error("Gagal memuat operation units:", err));
     return () => { mounted = false; };
-  }, []);
+  }, [user?.scope?.unitCode, user?.karyawan?.operationUnitId]);
 
   // Fetch weekly monitoring data
   const loadData = useCallback(async () => {

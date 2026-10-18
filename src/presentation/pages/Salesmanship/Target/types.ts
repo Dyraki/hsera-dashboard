@@ -23,6 +23,7 @@ export const JENIS_TARGET_OPTIONS = [
 
 export const HARI_KUNJUNGAN_OPTIONS = [
   { value: '', label: 'Semua Hari (Senin - Sabtu)' },
+  { value: '7', label: 'Senin - Jumat' },
   { value: '1', label: 'Senin (Hari 1)' },
   { value: '2', label: 'Selasa (Hari 2)' },
   { value: '3', label: 'Rabu (Hari 3)' },
@@ -45,6 +46,7 @@ export const getHariLabel = (hari?: number | null): string => {
     4: 'Kamis',
     5: 'Jumat',
     6: 'Sabtu',
+    7: 'Senin - Jumat',
   };
   return mapping[hari] || `Hari ${hari}`;
 };

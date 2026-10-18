@@ -15,6 +15,28 @@ export interface WeeklyMonitoringDayCell {
   alasan?: string | null; // Alasan jika TIDAK_ADA_KUNJUNGAN
 }
 
+export interface DistrictKpiAchievement {
+  target: {
+    kunjungan: number;
+    ec: number;
+    bd: number;
+    volume: number;
+  };
+  actual: {
+    kunjungan: number;
+    ec: number;
+    bd: number;
+    volume: number;
+  };
+  percent: {
+    kunjungan: number;
+    ec: number;
+    bd: number;
+    volume: number;
+    overall: number;
+  };
+}
+
 export interface WeeklyDistrictMonitoringRow {
   districtId: string;
   districtKode: string;
@@ -24,6 +46,7 @@ export interface WeeklyDistrictMonitoringRow {
   days: WeeklyMonitoringDayCell[];
   totalHariTerisi: number;
   persentaseLengkap: number;
+  kpiAchievement?: DistrictKpiAchievement;
 }
 
 export interface WeeklyMonitoringResponse {

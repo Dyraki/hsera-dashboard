@@ -1,169 +1,126 @@
-# Struktur Folder Frontend
+# Struktur Folder Frontend `hsera-dashboard`
 
-Dokumen ini menjelaskan struktur aktual `admin-dashboard/` setelah perbaikan arsitektur. Alur API mengikuti lapisan domain, use case, repository, dan composition root. Panduan ini membedakan pola yang sudah diterapkan dari bagian yang masih dapat dikembangkan.
+> **Tujuan Dokumen**: Dokumen ini memetakan struktur pohon folder aktual dari source code `hsera-dashboard/src/` beserta tanggung jawab setiap lapisannya sesuai kaidah Clean Architecture.
 
-## Struktur Proyek
+---
+
+## 1. Pohon Direktori Source Code
 
 ```text
-admin-dashboard/
-├── doc/                              # Dokumentasi frontend
-├── public/                           # Aset statis (opsional)
+hsera-dashboard/
+├── doc/                              # Dokumentasi arsitektur & modul proyek
+│   ├── README.md                     # Pusat navigasi & ikhtisar sistem
+│   ├── ARCHITECTURE.md               # Arsitektur sistem, auth, & token scope
+│   ├── SALESMANSHIP_MODULE.md        # Modul salesmanship, matriks, & rumus
+│   ├── DATABASE_SCHEMA.md            # Skema PostgreSQL dual-database
+│   ├── DEVELOPMENT_GUIDE.md          # Panduan penambahan fitur & troubleshooting
+│   └── STRUKTUR_FOLDER.md            # Pemetaan struktur file frontend (dokumen ini)
 ├── src/
-│   ├── core/
-│   │   ├── constants/                # Konstanta domain/aplikasi
-│   │   ├── di/container.ts           # Composition root: repository -> use case
-│   │   ├── domain/
-│   │   │   ├── errors/               # Error aplikasi yang bebas framework
-│   │   │   ├── models/               # Entity dan kontrak data domain
-│   │   │   └── repositories/         # Interface repository
-│   │   ├── infrastructure/
-│   │   │   ├── api/                  # Axios client dan validasi environment
-│   │   │   ├── dto/                  # Bentuk payload/respons backend
-│   │   │   ├── mappers/              # Konversi DTO <-> model/domain write data
-│   │   │   └── repositories/         # Implementasi interface dengan HTTP
-│   │   └── use-cases/                # Alur aplikasi yang bergantung pada interface domain
-│   ├── presentation/
+│   ├── core/                         # LOGIKA BISNIS INTI
+│   │   ├── constants/                # MenuConstants (SYSTEM_MENU_IDS), dll.
+│   │   ├── di/container.ts           # Composition root: instansiasi repository & use case
+│   │   ├── domain/                   # Model bisnis murni, interface repository, rules
+│   │   │   ├── errors/               # AppError
+│   │   │   ├── models/               # User, District, Target, Callsheet, Monitoring
+│   │   │   ├── permissions.ts        # Logika evaluasi bitmask ACL
+│   │   │   └── repositories/         # Interface kontrak repository
+│   │   ├── infrastructure/           # Adapter dunia luar (HTTP & Storage)
+│   │   │   ├── api/                  # AxiosHttpClient, SalesmanshipHttpClient, environment
+│   │   │   ├── dto/                  # Schema payload JSON backend
+│   │   │   ├── mappers/              # Transformasi DTO <-> Domain
+│   │   │   └── repositories/         # HttpAuthRepository, HttpSalesmanshipRepository, dll.
+│   │   └── use-cases/                # Alur use cases aplikasi
+│   ├── presentation/                 # ANTARMUKA PENGGUNA (REACT)
 │   │   ├── components/
-│   │   │   ├── form/                 # InputField, Input, Select, DatePicker, dll.
+│   │   │   ├── form/                 # InputField, Select, DatePicker, dll.
 │   │   │   ├── layout/               # AdminLayout, Header, Sidebar
-│   │   │   └── ui/                   # Button, Badge, SlideOver, ErrorBoundary
-│   │   ├── context/                  # State lintas UI, seperti AuthContext
-│   │   ├── pages/                    # Halaman dan modul berdasarkan fitur
-│   │   │   ├── Dashboard/
-│   │   │   ├── DesignSystem/
-│   │   │   ├── Login/
-│   │   │   ├── Master/
-│   │   │   ├── Settings/
-│   │   │   ├── System/               # Halaman sistem/fallback
-│   │   │   └── Unauthorized/
-│   │   ├── theme/                    # Token design system
-│   │   └── utils/                    # Helper tampilan
+│   │   │   └── ui/                   # Button, Badge, Modal, SlideOver, PermissionButton
+│   │   ├── context/                  # AuthContext, ToastContext
+│   │   ├── pages/                    # Halaman per modul bisnis
+│   │   │   ├── Dashboard/            # Dashboard Ringkasan Utama
+│   │   │   ├── Login/                # Halaman Autentikasi
+│   │   │   ├── Master/               # Master Karyawan & Operation Unit (OU)
+│   │   │   ├── Salesmanship/         # Modul Teritori, Target, Callsheet, Monitoring
+│   │   │   │   ├── Territory/        # Master Distrik & Penugasan Salesman
+│   │   │   │   ├── Target/           # Setup Target Bulanan Distrik
+│   │   │   │   ├── Callsheet/        # Input & Rekap Callsheet Harian (RIS)
+│   │   │   │   └── Monitoring/       # Monitoring Callsheet Mingguan & Kunci Periode
+│   │   │   ├── Settings/             # Menu, Role, Role-User (ACL)
+│   │   │   └── System/               # Unauthorized & Fallback Pages
+│   │   ├── theme/                    # Token Tailwind & Design System
+│   │   └── utils/                    # Helper formatting & UI
 │   ├── routes/
-│   │   ├── AppRoutes.tsx             # Lazy routes dan otorisasi
-│   │   ├── ProtectedRoute.tsx        # Guard login/ACL
-│   │   └── routePaths.ts              # Path route bernama
-│   ├── App.tsx                       # Shell router/provider/error boundary
-│   ├── index.css                     # Tailwind dan global styles
-│   ├── main.tsx                      # Mount React ke DOM
-│   └── vite-env.d.ts
-├── .eslintrc.cjs                     # Lint dan aturan dependency boundaries
-├── package.json                      # Script dan dependency
+│   │   ├── AppRoutes.tsx             # Lazy loading routes & guard otorisasi
+│   │   ├── ProtectedRoute.tsx        # Guard otorisasi berdasarkan login & level ACL
+│   │   └── routePaths.ts             # Konstanta path URL bernama
+│   ├── App.tsx                       # Root provider wrapper & Error Boundary
+│   ├── index.css                     # Tailwind CSS & global styling
+│   └── main.tsx                      # Entrypoint DOM React
+├── package.json
 ├── tailwind.config.js
-├── tsconfig.json                     # TypeScript dan alias @/*
-└── vite.config.ts                    # Vite, alias, konfigurasi Vitest
+├── tsconfig.json                     # Alias @/* -> src/*
+└── vite.config.ts                    # Konfigurasi bundler Vite & Vitest
 ```
 
-## Tanggung Jawab Lapisan
+---
 
-### `core/domain`
-
-Berisi entity/model domain, error aplikasi, dan interface repository. Kode di sini tidak boleh mengimpor React, Axios, atau `presentation`.
-
-Model seperti `Karyawan`, `OperationUnit`, `MenuRecord`, dan `ManagedUser` mewakili data bisnis. Nilai form dan opsi dropdown yang khusus UI ditempatkan di `types.ts` folder feature, bukan di model domain.
-
-### `core/use-cases`
-
-Mengekspresikan aksi yang dapat dipakai UI, misalnya mengambil daftar, menyimpan, atau menghapus entity. Use case bergantung pada interface repository, tidak pada implementasi HTTP.
-
-### `core/infrastructure`
-
-Lapisan adapter terhadap sistem luar:
-
-- `api/`: konfigurasi Axios, validasi `VITE_API_URL`, dan normalisasi kegagalan HTTP menjadi `AppError`.
-- `dto/`: bentuk wire data backend untuk Master serta endpoint Menu, Role/ACL, dan Managed User.
-- `mappers/`: transformasi DTO menjadi model serta data domain menjadi payload API.
-- `repositories/`: implementasi kontrak repository dengan Axios.
-
-Error dari Axios dinormalisasi sebagai `AppError` pada batas infrastructure. Komponen dan hook memakai `message` serta `status` error aplikasi, bukan membaca `AxiosError.response`.
-
-### `core/di/container.ts`
-
-Composition root tunggal. File ini membuat implementasi repository dan memasukkannya ke use case. Presentation mengimpor use case dari container; halaman tidak membuat `HttpRepository` dan tidak mengimpor `core/infrastructure`.
-
-### `presentation`
-
-Berisi UI dan interaksi pengguna. `components/ui`, `components/form`, dan `components/layout` mengelompokkan komponen bersama berdasarkan tanggung jawab. Komponen feature khusus tetap berdekatan dengan halaman yang menggunakannya.
-
-### `routes`
-
-`AppRoutes.tsx` mendaftarkan route menggunakan `React.lazy`/`Suspense`; `routePaths.ts` menjadi daftar path bernama; `ProtectedRoute.tsx` mengurus autentikasi dan izin akses. Design System Showcase hanya didaftarkan pada mode development.
-
-## Struktur Feature Master
+## 2. Struktur Modul Salesmanship (`presentation/pages/Salesmanship/`)
 
 ```text
-presentation/pages/Master/
-├── Karyawan/
-│   ├── KaryawanListPage.tsx
-│   ├── types.ts                    # Form values dan opsi UI fitur
+presentation/pages/Salesmanship/
+├── Territory/                        # 1. Teritori Management (District)
+│   ├── TerritoryListPage.tsx         # Halaman tabel teritori & filter OU
+│   ├── types.ts                      # Tipe state form & modal teritori
 │   ├── hooks/
-│   │   ├── useKaryawan.ts          # Menggabungkan sub-hook dan toast
-│   │   ├── useKaryawanList.ts      # Data, lookup, filter, pagination
-│   │   └── useKaryawanForm.ts      # Siklus form dan mutasi
+│   │   └── useTerritory.ts           # State, fetching, aksi create/update/delete
 │   └── components/
-│       ├── KaryawanTable.tsx
-│       ├── KaryawanFormDrawer.tsx
-│       └── KaryawanDetailDrawer.tsx
-└── OperationUnit/
-    ├── OperationUnitListPage.tsx
-    ├── types.ts                    # Form values fitur
-    ├── hooks/useOperationUnits.ts  # State dan aksi fitur
+│       ├── TerritoryTable.tsx
+│       ├── TerritoryModal.tsx
+│       └── TerritoryDeleteModal.tsx
+├── Target/                           # 2. Setup Target Bulanan
+│   ├── TargetListPage.tsx            # Halaman tabel target & filter
+│   ├── types.ts                      # Tipe filter & form target
+│   ├── types.test.ts                 # Unit test helper target
+│   ├── hooks/
+│   │   └── useTarget.ts              # State & filter target
+│   └── components/
+│       ├── TargetTable.tsx
+│       ├── TargetModal.tsx
+│       └── TargetDeleteModal.tsx
+├── Callsheet/                        # 3. Rekap Callsheet Harian (RIS)
+│   ├── CallsheetFormPage.tsx         # Halaman formulir rekap harian
+│   ├── types.ts                      # Tipe matriks produk & notasi
+│   ├── Callsheet.test.ts             # Unit test kalkulasi rumus matriks
+│   ├── hooks/
+│   │   └── useCallsheetForm.ts       # State form, validasi baris, autosave draft
+│   └── components/
+│       ├── CallsheetHeaderFilter.tsx # Filter distrik, tanggal, mode rekap
+│       ├── CallsheetMatrixTable.tsx  # Grid input angka (Brands x Notasi)
+│       ├── CallsheetKpiCards.tsx     # Ringkasan live status, EC, BD, volume
+│       └── CallsheetActionFooter.tsx # Tombol Simpan Draft & Finalisasi
+└── Monitoring/                       # 4. Monitoring Callsheet Mingguan
+    ├── MonitoringPage.tsx            # Halaman utama monitoring mingguan
+    ├── types.ts                      # Tipe filter mingguan & kartu KPI
+    ├── Monitoring.test.ts            # Unit test ISO week & defaulting OU user
+    ├── hooks/
+    │   └── useWeeklyMonitoring.ts    # Fetching rekap mingguan, filter OU user, lock
     └── components/
-        ├── OperationUnitOverview.tsx
-        ├── OperationUnitTable.tsx
-        ├── OperationUnitTree.tsx
-        ├── OperationUnitFormDrawer.tsx
-        └── OperationUnitDetailDrawer.tsx
+        ├── MonitoringHeader.tsx      # Judul & tombol ekspor CSV
+        ├── MonitoringWeekFilter.tsx  # Navigasi minggu ISO & dropdown filter OU
+        ├── MonitoringKpiCards.tsx    # 4 kartu KPI (Kelengkapan, EC, BD, Volume)
+        ├── MonitoringMatrixGrid.tsx  # Matriks Senin s/d Sabtu per distrik
+        └── LockWeekModal.tsx         # Modal konfirmasi Kunci / Buka Periode
 ```
 
-Page menyusun view dan meneruskan data/callback. Feature hook mengelola UI-state serta memanggil use case. Karyawan memisahkan `useKaryawanList` dan `useKaryawanForm`, disatukan oleh `useKaryawan`. Feature component menampilkan data dan mengirimkan callback, bukan melakukan request sendiri.
+---
 
-## Arah Dependensi
+## 3. Tanggung Jawab Lapisan & Aturan ESLint Boundaries
 
-```text
-presentation -> core/use-cases -> core/domain
-                                      ^
-                                      |
-                              core/infrastructure
+Untuk mencegah spaghetti code dan kebocoran dependensi:
 
-core/di/container.ts menghubungkan use case dengan implementasi repository.
-```
+1. **`core/domain`**: Hanya mendefinisikan interface dan logika bisnis murni tanpa ketergantungan framework.
+2. **`core/use-cases`**: Mengorkestrasi interaksi domain.
+3. **`core/infrastructure`**: Hanya dipanggil oleh `core/di/container.ts`. Komponen presentation dilarang mengimpor langsung dari `core/infrastructure`.
+4. **`presentation`**: Hanya berinteraksi dengan `useCases` dan instance repository yang disediakan oleh `core/di/container.ts`.
 
-Aturan yang ditegakkan ESLint melalui `eslint-plugin-boundaries`:
-
-- `core/domain` tidak mengimpor use case, infrastructure, DI, routes, atau presentation.
-- `core/use-cases` tidak mengimpor infrastructure, DI, routes, atau presentation.
-- `core/infrastructure` tidak mengimpor DI, routes, atau presentation.
-- `presentation` dan `routes` tidak mengimpor `core/infrastructure`.
-
-Jika logika UI khusus satu fitur, letakkan hook di `<fitur>/hooks/`. Jika aturan bisnis lintas fitur, letakkan fungsi/use case di `core`. Hook lintas fitur tanpa aturan bisnis dapat ditempatkan di `presentation/shared/hooks/` bila kebutuhan itu muncul.
-
-## Menambah Fitur
-
-1. Definisikan entity/domain contract di `core/domain/models` dan repository interface di `core/domain/repositories`.
-2. Buat DTO serta mapper di `core/infrastructure/dto` dan `mappers` untuk mengisolasi wire format API dari domain.
-3. Buat implementasi HTTP repository di `core/infrastructure/repositories`.
-4. Buat use case yang menerima interface repository melalui constructor.
-5. Daftarkan instance repository dan use case di `core/di/container.ts`.
-6. Buat folder feature di `presentation/pages/<kelompok>/<fitur>/`; tempatkan tipe form/opsi UI di `types.ts`.
-7. Gunakan hooks untuk state serta alur interaksi, dan komponen untuk tabel/form/detail.
-8. Daftarkan path di `routes/routePaths.ts` dan route/lazy import di `routes/AppRoutes.tsx`.
-9. Jalankan build, lint, dan test dari folder `admin-dashboard/`.
-
-## Validasi dan Perintah
-
-```sh
-npm run dev
-npm run build
-npm run lint
-npm run test
-npm run test:watch
-npm run preview
-```
-
-Konfigurasi tersedia untuk alias `@/*`, ESLint dependency boundaries, Vitest, dan Testing Library. Test mencakup mapper Operation Unit/Management, validasi `VITE_API_URL`, serta fallback ErrorBoundary.
-
-## Status Review
-
-Sudah diterapkan: form types dipisah dari domain, DTO/mapper dan repository/use case untuk Master serta Menu/Role/User ditambahkan, composition root dipakai oleh presentation, direct import infrastructure dari presentation dihilangkan, routes dilazy-load, komponen bersama dikelompokkan, `useKaryawan` dipisah menjadi list/form hooks, lint/boundaries dan test runner dikonfigurasi, ErrorBoundary dan validasi API environment ditambahkan.
-
-Masih dapat dikembangkan sesuai skala kebutuhan: TanStack Query untuk cache server-state, toast global, lebih banyak test unit/integrasi untuk setiap use case dan alur CRUD, serta meninjau apakah folder dokumentasi perlu dinamai ulang. Folder `use-cases/` dipertahankan sebagai konvensi yang sudah digunakan Auth dan fitur baru.
+Aturan ini diverifikasi oleh `eslint-plugin-boundaries` saat menjalankan `npm run lint`.
