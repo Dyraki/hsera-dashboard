@@ -1,5 +1,5 @@
-import React from 'react';
-import { District } from '@/core/domain/models/District';
+import React, { useMemo } from 'react';
+import { District, OperationUnitOption } from '@/core/domain/models/District';
 import { SlideOver } from '@/presentation/components/ui/SlideOver';
 import { Button } from '@/presentation/components/ui/Button';
 import { Input, Select } from '@/presentation/components/form';
@@ -18,6 +18,8 @@ interface TargetDrawerProps {
   formData: TargetFormData;
   formError: string | null;
   districts: District[];
+  operationUnits: OperationUnitOption[];
+  isSuperAdmin: boolean;
   isSubmitting: boolean;
   onClose: () => void;
   onChange: (data: TargetFormData) => void;
@@ -30,6 +32,8 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
   formData,
   formError,
   districts,
+  operationUnits,
+  isSuperAdmin,
   isSubmitting,
   onClose,
   onChange,
@@ -37,20 +41,59 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
 }) => {
   const isCreate = mode === 'create';
 
-  const districtOptions = [
-    { value: '', label: 'Global (Berlaku untuk Semua District)' },
-    ...districts.map((d) => ({
-      value: d.id,
-      label: `${d.kode} ${d.karyawanName ? `- ${d.karyawanName}` : ''}`,
-    })),
-  ];
+  const ouOptions = useMemo(() => {
+    const list = operationUnits.map((ou) => ({
+      value: ou.kode,
+      label: `${ou.kode} - ${ou.nama}`,
+    }));
+    if (isSuperAdmin) {
+      return [{ value: '', label: 'Global (Berlaku untuk Semua Unit & District)' }, ...list];
+    }
+    return list;
+  }, [operationUnits, isSuperAdmin]);
+
+  const districtOptions = useMemo(() => {
+    if (!formData.ouKode) {
+      return [
+        { value: '', label: 'Global (Berlaku untuk Semua District)' },
+        ...districts.map((d) => ({
+          value: d.id,
+          label: `${d.kode} (${d.ouKode}) ${d.karyawanName ? `- ${d.karyawanName}` : ''}`,
+        })),
+      ];
+    }
+
+    const filtered = districts.filter((d) => d.ouKode === formData.ouKode);
+    return [
+      { value: '', label: `Semua District di Unit ${formData.ouKode}` },
+      ...filtered.map((d) => ({
+        value: d.id,
+        label: `${d.kode} ${d.karyawanName ? `- ${d.karyawanName}` : ''}`,
+      })),
+    ];
+  }, [districts, formData.ouKode]);
+
+  const handleOuChange = (newOu: string) => {
+    let newDistrictId = formData.districtId;
+    if (newOu) {
+      const dist = districts.find((d) => d.id === newDistrictId);
+      if (!dist || dist.ouKode !== newOu) {
+        newDistrictId = '';
+      }
+    }
+    onChange({
+      ...formData,
+      ouKode: newOu,
+      districtId: newDistrictId,
+    });
+  };
 
   const quickPresets: Record<string, number[]> = {
     KUNJUNGAN: [20, 25, 30, 35, 40, 50],
     BD: [10, 15, 20, 25, 30],
     EC: [15, 20, 25, 30, 35],
     FACEUP: [10, 20, 30, 50],
-    VOLUME: [50, 100, 200, 500],
+    VOLUME: [50, 70, 100, 140, 200, 300],
   };
 
   const currentPresets = quickPresets[formData.jenisTarget] || [10, 20, 30, 40];
@@ -108,6 +151,20 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
           required
         />
 
+        {/* Operation Unit */}
+        <Select
+          label="Operation Unit / Cabang *"
+          value={formData.ouKode}
+          onChange={(e) => handleOuChange(e.target.value)}
+          options={ouOptions}
+          disabled={isSubmitting || (!isSuperAdmin && operationUnits.length <= 1)}
+          helperText={
+            isSuperAdmin
+              ? "Pilih 'Global' untuk target acuan seluruh unit, atau pilih unit cabang tertentu."
+              : "Target akan berlaku untuk Operation Unit yang dipilih."
+          }
+        />
+
         {/* Teritori District */}
         <Select
           label="Cakupan Teritori District"
@@ -115,7 +172,11 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
           onChange={(e) => onChange({ ...formData, districtId: e.target.value })}
           options={districtOptions}
           disabled={isSubmitting}
-          helperText="Pilih 'Global' jika target berlaku secara umum ke semua salesmen/district."
+          helperText={
+            formData.ouKode
+              ? `Pilih 'Semua District di Unit ${formData.ouKode}' untuk acuan cabang, atau pilih district salesmen tertentu untuk override khusus.`
+              : "Pilih 'Global' jika target berlaku secara umum ke semua salesmen/district."
+          }
         />
 
         {/* Hari Kunjungan */}
@@ -140,7 +201,11 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
             placeholder="Contoh: 40"
             disabled={isSubmitting}
             required
-            helperText="Masukkan angka nominal target capaian."
+            helperText={
+              formData.jenisTarget === 'VOLUME'
+                ? 'Masukkan target volume penjualan dalam satuan Pack (Pk).'
+                : 'Masukkan angka nominal target capaian.'
+            }
           />
 
           {/* Quick Preset Buttons */}

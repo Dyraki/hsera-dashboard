@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 
@@ -7,14 +7,40 @@ interface AdminLayoutProps {
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Mobile / tablet detection: initial state closed on mobile (< 1024px), open on desktop (>= 1024px)
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024;
+    }
+    return true;
+  });
+
+  // Track window resize to handle transitions between mobile and desktop viewports
+  useEffect(() => {
+    let prevWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const handleResize = () => {
+      const currentWidth = window.innerWidth;
+      // If transitioned from desktop to mobile: auto close to avoid overlay blocking
+      if (prevWidth >= 1024 && currentWidth < 1024) {
+        setSidebarOpen(false);
+      }
+      // If transitioned from mobile to desktop: auto expand
+      else if (prevWidth < 1024 && currentWidth >= 1024) {
+        setSidebarOpen(true);
+      }
+      prevWidth = currentWidth;
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="h-screen flex bg-gray-50 text-gray-700 font-sans overflow-hidden">
       {/* Mobile Backdrop Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden transition-opacity backdrop-blur-xs"
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />

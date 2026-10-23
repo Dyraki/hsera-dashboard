@@ -1,9 +1,10 @@
 import React from 'react';
 import { OperationUnitOption, SalesmanOption } from '@/core/domain/models/District';
+import { Channel } from '@/core/domain/models/Channel';
 import { Button } from '@/presentation/components/ui/Button';
 import { SlideOver } from '@/presentation/components/ui/SlideOver';
 import { ModalMode, TerritoryFormData } from '../types';
-import { MapPin, Building2, User, CheckCircle2, ShieldCheck, Filter } from 'lucide-react';
+import { MapPin, Building2, User, CheckCircle2, ShieldCheck, Filter, Layers, Check } from 'lucide-react';
 
 interface TerritoryModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface TerritoryModalProps {
   formData: TerritoryFormData;
   operationUnits: OperationUnitOption[];
   salesmen: SalesmanOption[];
+  channels: Channel[];
   isSubmitting: boolean;
   onClose: () => void;
   onChange: (data: TerritoryFormData) => void;
@@ -26,6 +28,7 @@ export const TerritoryModal: React.FC<TerritoryModalProps> = ({
   formData,
   operationUnits,
   salesmen,
+  channels,
   isSubmitting,
   onClose,
   onChange,
@@ -47,6 +50,17 @@ export const TerritoryModal: React.FC<TerritoryModalProps> = ({
       ...formData,
       ouKode: newOuKode,
       karyawanId: newKaryawanId,
+    });
+  };
+
+  const toggleChannel = (channelId: string) => {
+    const current = formData.channelIds || [];
+    const updated = current.includes(channelId)
+      ? current.filter((id) => id !== channelId)
+      : [...current, channelId];
+    onChange({
+      ...formData,
+      channelIds: updated,
     });
   };
 
@@ -151,6 +165,59 @@ export const TerritoryModal: React.FC<TerritoryModalProps> = ({
           />
           <p className="text-[11px] text-gray-500 mt-1">
             Kode wilayah harus unik dalam satu Operation Unit (maksimal 10 karakter).
+          </p>
+        </div>
+
+        {/* Channel Distribusi */}
+        <div>
+          <label className="block text-body-sm font-semibold text-gray-800 mb-1.5 flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <Layers size={15} className="text-gray-500" />
+              Channel Distribusi
+            </span>
+            <span className="text-[11px] font-normal text-gray-500">
+              Multi-pilih (bisa lebih dari 1)
+            </span>
+          </label>
+          {channels.length === 0 ? (
+            <div className="text-xs text-gray-500 italic p-3 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+              Memuat daftar channel...
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2.5">
+              {channels.map((ch) => {
+                const isSelected = (formData.channelIds || []).includes(ch.id);
+                return (
+                  <button
+                    key={ch.id}
+                    type="button"
+                    onClick={() => toggleChannel(ch.id)}
+                    className={`flex items-center justify-between p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? 'border-primary-500 bg-primary-50/70 text-primary-950 ring-1 ring-primary-500 shadow-xs'
+                        : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
+                    }`}
+                  >
+                    <div className="min-w-0 pr-2">
+                      <div className="text-sm font-semibold truncate">{ch.nama}</div>
+                      <div className="text-[11px] text-gray-500 uppercase font-mono">{ch.kode}</div>
+                    </div>
+                    <div
+                      className={`w-5 h-5 rounded flex items-center justify-center border transition-colors shrink-0 ${
+                        isSelected
+                          ? 'bg-primary-600 border-primary-600 text-white'
+                          : 'border-gray-300 bg-white'
+                      }`}
+                    >
+                      {isSelected && <Check size={13} strokeWidth={3} />}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <p className="text-[11px] text-gray-500 mt-1.5">
+            Pilih channel distribusi yang dilayani oleh teritori ini (contoh: DO-012 melayani Agen & Wholesale).
           </p>
         </div>
 

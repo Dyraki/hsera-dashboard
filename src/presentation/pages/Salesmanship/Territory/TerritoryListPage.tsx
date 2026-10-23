@@ -14,6 +14,7 @@ export const TerritoryListPage: React.FC = () => {
     districts,
     operationUnits,
     salesmen,
+    channels,
     isLoading,
     searchKeyword,
     setSearchKeyword,
@@ -130,6 +131,7 @@ export const TerritoryListPage: React.FC = () => {
           formData={formData}
           operationUnits={operationUnits}
           salesmen={salesmen}
+          channels={channels}
           isSubmitting={isSubmitting}
           onClose={closeModal}
           onChange={setFormData}

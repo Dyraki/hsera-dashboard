@@ -13,7 +13,11 @@ export const TargetListPage: React.FC = () => {
     targets,
     rawTargetsCount,
     districts,
+    operationUnits,
+    isSuperAdmin,
     isLoading,
+    filterOu,
+    setFilterOu,
     filterJenis,
     setFilterJenis,
     filterDistrict,
@@ -45,6 +49,15 @@ export const TargetListPage: React.FC = () => {
   const countBd = targets.filter((t) => t.jenisTarget === 'BD').length;
   const countEc = targets.filter((t) => t.jenisTarget === 'EC').length;
 
+  const filteredDistricts = filterOu !== 'all'
+    ? districts.filter((d) => d.ouKode === filterOu)
+    : districts;
+
+  const handleOuFilterChange = (val: string) => {
+    setFilterOu(val);
+    setFilterDistrict('all');
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -59,7 +72,7 @@ export const TargetListPage: React.FC = () => {
                 Setup Target Salesmanship
               </h1>
               <p className="text-body-sm text-gray-500 mt-0.5">
-                Konfigurasi acuan target harian salesmen: Kunjungan Toko, Brand Distribution (BD), dan Effective Call (EC).
+                Konfigurasi acuan target harian salesmen: Kunjungan Toko, Brand Distribution (BD), Effective Call (EC), dan Volume Penjualan.
               </p>
             </div>
           </div>
@@ -125,11 +138,11 @@ export const TargetListPage: React.FC = () => {
 
         {/* Filter and Search Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-white border border-gray-200 p-4 rounded-xl shadow-2xs">
-          <div className="sm:col-span-5 relative">
+          <div className="sm:col-span-3 relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <input
               type="text"
-              placeholder="Cari jenis target, district, nilai..."
+              placeholder="Cari target, unit, district..."
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               className="w-full bg-white border border-gray-300 pl-10 pr-4 py-2 rounded-lg text-body-sm text-gray-900 placeholder:text-gray-400 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
@@ -137,6 +150,24 @@ export const TargetListPage: React.FC = () => {
           </div>
 
           <div className="sm:col-span-3">
+            <select
+              value={filterOu}
+              onChange={(e) => handleOuFilterChange(e.target.value)}
+              disabled={!isSuperAdmin && operationUnits.length <= 1}
+              className="w-full bg-white border border-gray-300 px-3 py-2 rounded-lg text-body-sm text-gray-900 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 outline-none cursor-pointer disabled:bg-gray-100 disabled:text-gray-500"
+            >
+              {(isSuperAdmin || operationUnits.length > 1) && (
+                <option value="all">Semua Operation Unit</option>
+              )}
+              {operationUnits.map((ou) => (
+                <option key={ou.id} value={ou.kode}>
+                  {ou.kode} - {ou.nama}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="sm:col-span-2">
             <select
               value={filterJenis}
               onChange={(e) => setFilterJenis(e.target.value)}
@@ -158,10 +189,10 @@ export const TargetListPage: React.FC = () => {
               className="w-full bg-white border border-gray-300 px-3 py-2 rounded-lg text-body-sm text-gray-900 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 outline-none cursor-pointer"
             >
               <option value="all">Semua Cakupan</option>
-              <option value="">Global (Tanpa District)</option>
-              {districts.map((d) => (
+              <option value="">{filterOu !== 'all' ? `Target Unit (${filterOu})` : 'Global (Tanpa District)'}</option>
+              {filteredDistricts.map((d) => (
                 <option key={d.id} value={d.id}>
-                  {d.kode}
+                  {d.kode} {d.karyawanName ? `- ${d.karyawanName}` : ''}
                 </option>
               ))}
             </select>
@@ -196,6 +227,8 @@ export const TargetListPage: React.FC = () => {
           formData={formData}
           formError={formError}
           districts={districts}
+          operationUnits={operationUnits}
+          isSuperAdmin={isSuperAdmin}
           isSubmitting={isSubmitting}
           onClose={closeDrawer}
           onChange={setFormData}

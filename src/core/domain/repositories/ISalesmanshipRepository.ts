@@ -1,7 +1,9 @@
 import { WeeklyMonitoringResponse } from "../models/Monitoring";
 import { District, DistrictWriteData, SalesmanOption, OperationUnitOption } from "../models/District";
+import { Channel } from "../models/Channel";
 import { Target, TargetWriteData, TargetFilterQuery } from "../models/Target";
 import { CallsheetFormResponse, SaveCallsheetPayload } from "../models/Callsheet";
+import { Brand, BrandWriteData, BrandOrderItem, BrandFilterQuery } from "../models/Brand";
 
 export interface DistrictFilterQuery {
   ouKode?: string;
@@ -17,6 +19,13 @@ export interface ISalesmanshipRepository {
   deleteDistrict(id: string): Promise<void>;
   getSalesmen(): Promise<SalesmanOption[]>;
   getOperationUnits(): Promise<OperationUnitOption[]>;
+  getChannels(status?: string): Promise<Channel[]>;
+
+  // Brand Management
+  getBrands(filter?: BrandFilterQuery): Promise<Brand[]>;
+  saveBrand(data: BrandWriteData): Promise<Brand>;
+  reorderBrands(orders: BrandOrderItem[]): Promise<void>;
+  deleteBrand(id: string): Promise<void>;
 
   // Target Management
   getTargets(filter?: TargetFilterQuery): Promise<Target[]>;
@@ -31,4 +40,8 @@ export interface ISalesmanshipRepository {
   // Weekly Monitoring & Lock Audit
   getWeeklyMonitoring(kodeMinggu?: number, ouKode?: string): Promise<WeeklyMonitoringResponse>;
   toggleWeekLock(kodeMinggu: number, status: "AKTIF" | "NONAKTIF", catatan?: string): Promise<any>;
+
+  // Weekly District Report
+  getWeeklyDistrictReport(filter: import('../models/ReportWeeklyDistrict').WeeklyDistrictReportFilterQuery): Promise<import('../models/ReportWeeklyDistrict').WeeklyDistrictReportResponse>;
+  getAvailableWeeks(ouKode?: string): Promise<import('../models/ReportWeeklyDistrict').AvailableWeekOption[]>;
 }

@@ -5,7 +5,8 @@ export type ModalMode = 'create' | 'edit';
 export interface TargetFormData {
   id?: string;
   jenisTarget: JenisTarget;
-  districtId: string; // '' means null/Global
+  ouKode: string; // '' means null/Global
+  districtId: string; // '' means null/Global or all districts in OU
   hariKunjungan: string; // '' means null/Semua Hari, '1'..'6'
   nilai: number | string;
   berlakuDari: string; // YYYY-MM-DD

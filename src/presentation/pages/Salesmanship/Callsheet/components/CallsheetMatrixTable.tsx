@@ -92,6 +92,10 @@ export const CallsheetMatrixTable: React.FC<CallsheetMatrixTableProps> = ({
             <strong className="text-gray-900">BD: Auto-Sum</strong> (SK+SL+SD+OOS+SB)
           </span>
           <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
+            <strong className="text-gray-900">BPJ: Auto-Calc</strong> (Kunjungan - Lainnya)
+          </span>
+          <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
             <span className="text-gray-700">Valid (Total = Kunjungan)</span>
           </span>
@@ -151,7 +155,10 @@ export const CallsheetMatrixTable: React.FC<CallsheetMatrixTableProps> = ({
               <th className="py-2 px-1 text-center w-12 border-r border-gray-200">OOS</th>
               <th className="py-2 px-1 text-center w-12 border-r border-gray-200">SB</th>
               <th className="py-2 px-1 text-center w-12 border-r border-gray-200">TL</th>
-              <th className="py-2 px-1 text-center w-12 border-r border-gray-200">BPJ</th>
+              <th className="py-2 px-1 text-center w-12 border-r border-gray-200 bg-amber-50/70 text-amber-800 font-bold">
+                BPJ
+                <span className="block text-[10px] font-normal text-amber-600 lowercase">auto</span>
+              </th>
               {/* Kuantitas Columns */}
               <th className="py-2 px-1 text-center w-14 border-r border-gray-200">Stock</th>
               <th className="py-2 px-1 text-center w-14 border-r border-gray-200">Buy</th>
@@ -196,7 +203,7 @@ export const CallsheetMatrixTable: React.FC<CallsheetMatrixTableProps> = ({
                   </td>
 
                   {/* STATUS OUTLET CELLS */}
-                  {["SK", "SL", "SD", "OOS", "SB", "TL", "BPJ"].map((notasi) => (
+                  {["SK", "SL", "SD", "OOS", "SB", "TL"].map((notasi) => (
                     <td key={notasi} className="py-1 px-1 border-r border-gray-200 text-center">
                       <input
                         id={`cell-${brand.id}-${notasi}`}
@@ -214,6 +221,13 @@ export const CallsheetMatrixTable: React.FC<CallsheetMatrixTableProps> = ({
                       />
                     </td>
                   ))}
+
+                  {/* BPJ (AUTO-CALC) - Read Only Amber Cell */}
+                  <td className="py-1 px-1 text-center border-r border-gray-200 bg-amber-50/70">
+                    <span className="block font-bold text-amber-800 font-mono text-xs py-1">
+                      {row["BPJ"] || 0}
+                    </span>
+                  </td>
 
                   {/* BD (AUTO-SUM) - Read Only Purple Cell */}
                   <td className="py-1 px-1 text-center border-r border-gray-200 bg-purple-50/70">
@@ -296,7 +310,9 @@ export const CallsheetMatrixTable: React.FC<CallsheetMatrixTableProps> = ({
               <td className="py-2 px-1 text-center font-mono border-r border-gray-200">{columnTotals.oos}</td>
               <td className="py-2 px-1 text-center font-mono border-r border-gray-200">{columnTotals.sb}</td>
               <td className="py-2 px-1 text-center font-mono border-r border-gray-200">{columnTotals.tl}</td>
-              <td className="py-2 px-1 text-center font-mono border-r border-gray-200">{columnTotals.bpj}</td>
+              <td className="py-2 px-1 text-center font-mono border-r border-gray-200 bg-amber-100/70 text-amber-900">
+                {columnTotals.bpj}
+              </td>
               {/* BD SUM */}
               <td className="py-2 px-1 text-center font-mono border-r border-gray-200 bg-purple-100/70 text-purple-900">
                 {columnTotals.bd}

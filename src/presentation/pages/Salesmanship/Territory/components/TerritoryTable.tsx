@@ -41,6 +41,21 @@ export const TerritoryTable: React.FC<TerritoryTableProps> = ({
     }
   };
 
+  const getChannelBadgeClass = (channelKode: string) => {
+    switch (channelKode.toUpperCase()) {
+      case 'AGEN':
+        return 'bg-purple-50 text-purple-700 border-purple-200';
+      case 'WHOLESALE':
+        return 'bg-sky-50 text-sky-700 border-sky-200';
+      case 'RETAIL':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'MTI':
+        return 'bg-amber-50 text-amber-700 border-amber-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
@@ -50,6 +65,7 @@ export const TerritoryTable: React.FC<TerritoryTableProps> = ({
               <th className="py-3.5 px-4">KODE TERITORI</th>
               <th className="py-3.5 px-4">OPERATION UNIT</th>
               <th className="py-3.5 px-4">SALESMAN LAPANGAN</th>
+              <th className="py-3.5 px-4">CHANNEL</th>
               <th className="py-3.5 px-4">TERAKHIR DIUBAH</th>
               <th className="py-3.5 px-4">STATUS</th>
               <th className="py-3.5 px-4 text-right">AKSI</th>
@@ -58,14 +74,14 @@ export const TerritoryTable: React.FC<TerritoryTableProps> = ({
           <tbody className="divide-y divide-gray-200">
             {isLoading ? (
               <tr>
-                <td colSpan={6} className="py-12 text-center text-gray-600">
+                <td colSpan={7} className="py-12 text-center text-gray-600">
                   <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full mx-auto" />
                   <p className="text-body-sm mt-2">Memuat data teritori...</p>
                 </td>
               </tr>
             ) : districts.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-12 text-center text-gray-600">
+                <td colSpan={7} className="py-12 text-center text-gray-600">
                   <MapPin size={36} className="mx-auto text-gray-400" />
                   <p className="text-body-sm font-medium mt-2">Tidak ada data teritori ditemukan.</p>
                   <PermissionButton
@@ -109,6 +125,24 @@ export const TerritoryTable: React.FC<TerritoryTableProps> = ({
                         <div className="font-medium text-gray-900">{d.karyawanName || d.karyawanId}</div>
                         <div className="text-caption text-gray-600 font-mono">ID: {d.karyawanId}</div>
                       </div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      {d.channels && d.channels.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5 max-w-[220px]">
+                          {d.channels.map((ch) => (
+                            <span
+                              key={ch.id}
+                              className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${getChannelBadgeClass(
+                                ch.kode
+                              )}`}
+                            >
+                              {ch.nama}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-xs italic">- Belum diatur -</span>
+                      )}
                     </td>
                     <td className="py-3.5 px-4 text-gray-700">
                       <span className="text-body-sm">{formatDate(d.updatedAt || d.createdAt)}</span>

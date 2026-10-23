@@ -1,10 +1,12 @@
 import { District, OperationUnitOption, SalesmanOption } from '@/core/domain/models/District';
+import { Channel } from '@/core/domain/models/Channel';
 
 export interface TerritoryFormData {
   id?: string;
   ouKode: string;
   kode: string;
   karyawanId: string;
+  channelIds: string[];
   status: string;
 }
 
@@ -14,6 +16,7 @@ export interface TerritoryState {
   districts: District[];
   operationUnits: OperationUnitOption[];
   salesmen: SalesmanOption[];
+  channels: Channel[];
   isLoading: boolean;
   searchKeyword: string;
   filterOu: string;

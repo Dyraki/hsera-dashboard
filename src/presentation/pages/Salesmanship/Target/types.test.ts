@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getHariLabel, JENIS_TARGET_OPTIONS, HARI_KUNJUNGAN_OPTIONS } from './types';
+import { getHariLabel, JENIS_TARGET_OPTIONS, HARI_KUNJUNGAN_OPTIONS, TargetFormData } from './types';
 
 describe('Target Page Types & Helpers', () => {
   it('correctly maps hari number to label', () => {
@@ -31,4 +31,20 @@ describe('Target Page Types & Helpers', () => {
     expect(HARI_KUNJUNGAN_OPTIONS[2].value).toBe('1');
     expect(HARI_KUNJUNGAN_OPTIONS[7].value).toBe('6');
   });
+
+  it('supports ouKode in TargetFormData for Operation Unit scope', () => {
+    const sampleData: TargetFormData = {
+      jenisTarget: 'VOLUME',
+      ouKode: 'SMG',
+      districtId: '',
+      hariKunjungan: '',
+      nilai: 100,
+      berlakuDari: '2026-01-01',
+      berlakuSampai: '',
+      status: 'AKTIF',
+    };
+    expect(sampleData.ouKode).toBe('SMG');
+    expect(sampleData.districtId).toBe('');
+  });
 });
+

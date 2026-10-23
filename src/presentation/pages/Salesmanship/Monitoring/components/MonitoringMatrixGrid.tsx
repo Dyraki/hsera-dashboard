@@ -38,7 +38,6 @@ const getKpiPillColor = (percent: number): string => {
 export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
   districts,
   isLoading = false,
-  weekResponse: _weekResponse,
 }) => {
   const navigate = useNavigate();
 

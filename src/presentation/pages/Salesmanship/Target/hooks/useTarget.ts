@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Target, JenisTarget } from '@/core/domain/models/Target';
-import { District } from '@/core/domain/models/District';
+import { District, OperationUnitOption } from '@/core/domain/models/District';
 import { salesmanshipRepository } from '@/core/di/container';
+import { useAuth } from '@/presentation/context/AuthContext';
 import { useToast } from '@/presentation/context/ToastContext';
 import { ModalMode, TargetFormData } from '../types';
 
@@ -9,6 +10,7 @@ const defaultToday = new Date().toISOString().split('T')[0];
 
 const initialFormData: TargetFormData = {
   jenisTarget: 'KUNJUNGAN',
+  ouKode: '',
   districtId: '',
   hariKunjungan: '',
   nilai: '',
@@ -18,13 +20,19 @@ const initialFormData: TargetFormData = {
 };
 
 export const useTarget = () => {
+  const { user } = useAuth();
   const { showToast } = useToast();
+
+  const isSuperAdmin = user?.scope?.isSuperAdmin === true;
+  const userUnitCode = user?.scope?.unitCode || '';
 
   const [targets, setTargets] = useState<Target[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
+  const [operationUnits, setOperationUnits] = useState<OperationUnitOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Filters
+  const [filterOu, setFilterOu] = useState<string>('all');
   const [filterJenis, setFilterJenis] = useState<string>('all');
   const [filterDistrict, setFilterDistrict] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -43,7 +51,27 @@ export const useTarget = () => {
   const [targetToDelete, setTargetToDelete] = useState<Target | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Fetch Districts lookup
+  // Fetch Operation Units lookup
+  const fetchOperationUnits = useCallback(async () => {
+    try {
+      const units = await salesmanshipRepository.getOperationUnits();
+      setOperationUnits(units);
+
+      // Default OU handling based on user scope:
+      // If user has a single affiliated unit and is not super admin, lock to that unit
+      if (!isSuperAdmin) {
+        if (units.length === 1) {
+          setFilterOu(units[0].kode);
+        } else if (userUnitCode) {
+          setFilterOu(userUnitCode);
+        }
+      }
+    } catch (err: any) {
+      console.warn('Gagal memuat daftar operation unit:', err.message);
+    }
+  }, [isSuperAdmin, userUnitCode]);
+
+  // Fetch Districts lookup (load all permitted districts so drawer and filters have access)
   const fetchDistricts = useCallback(async () => {
     try {
       const data = await salesmanshipRepository.getDistricts();
@@ -58,6 +86,7 @@ export const useTarget = () => {
     setIsLoading(true);
     try {
       const data = await salesmanshipRepository.getTargets({
+        ouKode: filterOu !== 'all' ? filterOu : undefined,
         districtId: filterDistrict !== 'all' ? filterDistrict : undefined,
         jenisTarget: filterJenis !== 'all' ? (filterJenis as JenisTarget) : undefined,
         status: filterStatus !== 'all' ? filterStatus : undefined,
@@ -69,11 +98,12 @@ export const useTarget = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [filterDistrict, filterJenis, filterStatus, showToast]);
+  }, [filterOu, filterDistrict, filterJenis, filterStatus, showToast]);
 
   useEffect(() => {
+    fetchOperationUnits();
     fetchDistricts();
-  }, [fetchDistricts]);
+  }, [fetchOperationUnits, fetchDistricts]);
 
   useEffect(() => {
     fetchTargets();
@@ -84,8 +114,26 @@ export const useTarget = () => {
     setDrawerMode('create');
     setSelectedTarget(null);
     setFormError(null);
+
+    // Determine default OU for creation
+    let defaultOu = '';
+    if (!isSuperAdmin) {
+      if (filterOu !== 'all') {
+        defaultOu = filterOu;
+      } else if (userUnitCode) {
+        defaultOu = userUnitCode;
+      } else if (operationUnits.length > 0) {
+        defaultOu = operationUnits[0].kode;
+      }
+    } else {
+      if (filterOu !== 'all') {
+        defaultOu = filterOu;
+      }
+    }
+
     setFormData({
       ...initialFormData,
+      ouKode: defaultOu,
       berlakuDari: new Date().toISOString().split('T')[0],
     });
     setIsDrawerOpen(true);
@@ -105,6 +153,7 @@ export const useTarget = () => {
     setFormData({
       id: target.id,
       jenisTarget: target.jenisTarget,
+      ouKode: target.ouKode || '',
       districtId: target.districtId || '',
       hariKunjungan: target.hariKunjungan !== null && target.hariKunjungan !== undefined ? String(target.hariKunjungan) : '',
       nilai: target.nilai,
@@ -134,6 +183,12 @@ export const useTarget = () => {
       return;
     }
 
+    // Role check: non-superadmin cannot create global target (must choose an OU)
+    if (!isSuperAdmin && !formData.ouKode) {
+      setFormError('Operation Unit wajib dipilih untuk akun non-Super Admin.');
+      return;
+    }
+
     const numNilai = Number(formData.nilai);
     if (isNaN(numNilai) || numNilai <= 0) {
       setFormError('Nilai target harus berupa angka lebih besar dari 0.');
@@ -155,6 +210,7 @@ export const useTarget = () => {
       await salesmanshipRepository.saveTarget({
         id: drawerMode === 'edit' && selectedTarget ? selectedTarget.id : undefined,
         jenisTarget: formData.jenisTarget,
+        ouKode: formData.ouKode ? formData.ouKode : null,
         districtId: formData.districtId ? formData.districtId : null,
         hariKunjungan: formData.hariKunjungan ? Number(formData.hariKunjungan) : null,
         nilai: numNilai,
@@ -216,15 +272,20 @@ export const useTarget = () => {
     const q = searchKeyword.toLowerCase();
     const matchJenis = t.jenisTarget.toLowerCase().includes(q);
     const matchKode = (t.districtKode || '').toLowerCase().includes(q);
+    const matchOu = (t.ouKode || '').toLowerCase().includes(q);
     const matchNilai = String(t.nilai).includes(q);
-    return matchJenis || matchKode || matchNilai;
+    return matchJenis || matchKode || matchOu || matchNilai;
   });
 
   return {
     targets: filteredTargets,
     rawTargetsCount: targets.length,
     districts,
+    operationUnits,
+    isSuperAdmin,
     isLoading,
+    filterOu,
+    setFilterOu,
     filterJenis,
     setFilterJenis,
     filterDistrict,

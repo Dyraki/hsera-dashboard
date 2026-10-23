@@ -3,7 +3,7 @@ import { Target, JenisTarget } from '@/core/domain/models/Target';
 import { Badge } from '@/presentation/components/ui/Badge';
 import { PermissionButton } from '@/presentation/components/ui/PermissionButton';
 import { SYSTEM_MENU_IDS } from '@/core/constants/MenuConstants';
-import { Target as TargetIcon, Pencil, Trash2, Globe, Calendar, MapPin } from 'lucide-react';
+import { Target as TargetIcon, Pencil, Trash2, Globe, Calendar, MapPin, Building2 } from 'lucide-react';
 import { getHariLabel } from '../types';
 
 interface TargetTableProps {
@@ -119,11 +119,26 @@ export const TargetTable: React.FC<TargetTableProps> = ({
                           <span className="font-mono font-semibold bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 text-xs">
                             {t.districtKode}
                           </span>
+                          {t.ouKode && (
+                            <span className="text-xs text-gray-500 font-normal">
+                              ({t.ouKode})
+                            </span>
+                          )}
+                        </div>
+                      ) : t.ouKode ? (
+                        <div className="flex items-center gap-1.5 text-gray-700">
+                          <Building2 size={15} className="text-amber-500 shrink-0" />
+                          <span className="font-mono font-semibold bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-200 text-xs">
+                            Unit: {t.ouKode}
+                          </span>
+                          <span className="text-xs text-gray-500 font-normal">
+                            (Semua District)
+                          </span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5 text-gray-600">
                           <Globe size={15} className="text-gray-400 shrink-0" />
-                          <span className="text-xs font-semibold text-gray-600">Global (Semua District)</span>
+                          <span className="text-xs font-semibold text-gray-600">Global (Semua Unit)</span>
                         </div>
                       )}
                     </td>
@@ -145,7 +160,7 @@ export const TargetTable: React.FC<TargetTableProps> = ({
                           {Number(t.nilai).toLocaleString('id-ID')}
                         </span>
                         <span className="text-[11px] font-medium text-gray-500 uppercase">
-                          {t.jenisTarget === 'KUNJUNGAN' ? 'toko' : t.jenisTarget === 'VOLUME' ? 'slop' : 'outlet'}
+                          {t.jenisTarget === 'KUNJUNGAN' ? 'toko' : t.jenisTarget === 'VOLUME' ? 'pack (pk)' : 'outlet'}
                         </span>
                       </div>
                     </td>

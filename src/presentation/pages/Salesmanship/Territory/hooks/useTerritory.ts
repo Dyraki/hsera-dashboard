@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { District, OperationUnitOption, SalesmanOption } from '@/core/domain/models/District';
+import { Channel } from '@/core/domain/models/Channel';
 import { salesmanshipRepository } from '@/core/di/container';
 import { useToast } from '@/presentation/context/ToastContext';
 import { ModalMode, TerritoryFormData } from '../types';
@@ -8,6 +9,7 @@ const initialFormData: TerritoryFormData = {
   ouKode: '',
   kode: '',
   karyawanId: '',
+  channelIds: [],
   status: 'AKTIF',
 };
 
@@ -17,6 +19,7 @@ export const useTerritory = () => {
   const [districts, setDistricts] = useState<District[]>([]);
   const [operationUnits, setOperationUnits] = useState<OperationUnitOption[]>([]);
   const [salesmen, setSalesmen] = useState<SalesmanOption[]>([]);
+  const [channels, setChannels] = useState<Channel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Filters
@@ -36,15 +39,17 @@ export const useTerritory = () => {
   const [districtToDelete, setDistrictToDelete] = useState<District | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Fetch Lookups (OUs & Salesmen)
+  // Fetch Lookups (OUs, Salesmen & Channels)
   const fetchLookups = useCallback(async () => {
     try {
-      const [ouList, smList] = await Promise.all([
+      const [ouList, smList, chList] = await Promise.all([
         salesmanshipRepository.getOperationUnits(),
         salesmanshipRepository.getSalesmen(),
+        salesmanshipRepository.getChannels(),
       ]);
       setOperationUnits(ouList);
       setSalesmen(smList);
+      setChannels(chList);
     } catch (err: any) {
       console.warn('Gagal memuat data referensi:', err.message);
     }
@@ -90,6 +95,7 @@ export const useTerritory = () => {
       ouKode: defaultOu,
       kode: '',
       karyawanId: defaultSalesman,
+      channelIds: [],
       status: 'AKTIF',
     });
     setIsModalOpen(true);
@@ -104,6 +110,7 @@ export const useTerritory = () => {
       ouKode: district.ouKode,
       kode: district.kode,
       karyawanId: district.karyawanId,
+      channelIds: district.channels ? district.channels.map((c) => c.id) : [],
       status: district.status,
     });
     setIsModalOpen(true);
@@ -138,6 +145,7 @@ export const useTerritory = () => {
           ouKode: formData.ouKode.trim().toUpperCase(),
           kode: formData.kode.trim().toUpperCase(),
           karyawanId: formData.karyawanId,
+          channelIds: formData.channelIds,
           status: formData.status,
         });
         showToast('success', `Teritori '${formData.kode.toUpperCase()}' berhasil ditambahkan.`);
@@ -146,6 +154,7 @@ export const useTerritory = () => {
           ouKode: formData.ouKode.trim().toUpperCase(),
           kode: formData.kode.trim().toUpperCase(),
           karyawanId: formData.karyawanId,
+          channelIds: formData.channelIds,
           status: formData.status,
         });
         showToast('success', `Teritori '${formData.kode.toUpperCase()}' berhasil diperbarui.`);
@@ -196,6 +205,7 @@ export const useTerritory = () => {
     districts,
     operationUnits,
     salesmen,
+    channels,
     isLoading,
     searchKeyword,
     setSearchKeyword,

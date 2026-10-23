@@ -45,7 +45,7 @@ Target ditetapkan per distrik per periode bulan & tahun.
 ### 4 Jenis Target Penjualan:
 | Kode Target | Nama Target | Satuan Nilai | Penjelasan |
 | :--- | :--- | :---: | :--- |
-| `VOLUME` | Target Volume GG | Ribu / Slop / Karton | Target kuantitas rokok Gudang Garam yang wajib terjual dalam sebulan. |
+| `VOLUME` | Target Volume GG | Pack (Pk) | Target kuantitas rokok Gudang Garam (satuan pack/bungkus) yang wajib terjual. |
 | `EFFECTIVE_CALL` | Target EC | Outlet | Target jumlah outlet unik yang melakukan transaksi pembelian riil. |
 | `CALLMADE` | Target Callmade | Kunjungan | Target total kunjungan fisik yang harus dilakukan salesman ke outlet. |
 | `BRAND_DISTRIBUTION` | Target BD Outlet | Outlet | Target sebaran outlet yang mendisplaikan stok produk secara efektif. |

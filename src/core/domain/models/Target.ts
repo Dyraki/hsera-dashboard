@@ -3,6 +3,8 @@ export type JenisTarget = 'KUNJUNGAN' | 'BD' | 'EC' | 'FACEUP' | 'VOLUME';
 export interface Target {
   id: string;
   jenisTarget: JenisTarget;
+  ouKode?: string | null;
+  ouNama?: string | null;
   districtId?: string | null;
   districtKode?: string | null;
   hariKunjungan?: number | null; // 1 = Senin, 2 = Selasa, 3 = Rabu, 4 = Kamis, 5 = Jumat, 6 = Sabtu
@@ -17,6 +19,7 @@ export interface Target {
 export interface TargetWriteData {
   id?: string;
   jenisTarget: JenisTarget;
+  ouKode?: string | null;
   districtId?: string | null;
   hariKunjungan?: number | null;
   nilai: number;
@@ -26,6 +29,7 @@ export interface TargetWriteData {
 }
 
 export interface TargetFilterQuery {
+  ouKode?: string | null;
   districtId?: string;
   jenisTarget?: JenisTarget | string;
   status?: string;

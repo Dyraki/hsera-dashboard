@@ -7,12 +7,14 @@ export interface CallsheetDistrict {
   ouKode: string;
   karyawanId: string;
   karyawanName: string;
+  channels?: Array<{ id: string; kode: string; nama: string }>;
 }
 
 export interface CallsheetTargets {
   kunjungan: number;
   bd: number;
   ec: number;
+  volume?: number;
 }
 
 export interface CallsheetBrand {

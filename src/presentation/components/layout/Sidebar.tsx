@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -27,6 +28,18 @@ interface SidebarProps {
 export const normalizePath = (link?: string | null): string => {
   if (!link || link === '#') return '';
   return link.startsWith('/') ? link : '/' + link;
+};
+
+// Check if any child route is active
+export const hasActiveChildRoute = (node: MenuNode, pathname: string): boolean => {
+  if (!node.submenus || node.submenus.length === 0) return false;
+  return node.submenus.some((child) => {
+    const p = normalizePath(child.link);
+    if (p && (pathname === p || pathname.startsWith(p + '/'))) {
+      return true;
+    }
+    return hasActiveChildRoute(child, pathname);
+  });
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
@@ -68,12 +81,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
 
   return (
     <aside
-      className={`relative z-50 flex flex-col bg-[#160a34] text-bodydark1 border-r border-purple-950/60 shadow-2xl transition-[width,transform] duration-300 ease-in-out ${sidebarOpen
-        ? 'w-72 translate-x-0'
-        : '-translate-x-full lg:translate-x-0 lg:w-20'
-        } fixed inset-y-0 left-0 lg:static`}
+      className={`z-50 flex flex-col bg-[#160a34] text-bodydark1 border-r border-purple-950/60 shadow-2xl transition-[width,transform] duration-300 ease-in-out ${
+        sidebarOpen
+          ? 'w-72 max-w-[85vw] translate-x-0'
+          : '-translate-x-full lg:translate-x-0 lg:w-20'
+      } fixed inset-y-0 left-0 lg:relative lg:shrink-0 h-full`}
     >
-      {/* Floating Circular Toggle Button on the Right Edge (Desktop) */}
+      {/* Floating Circular Toggle Button on the Right Edge (Desktop only) */}
       <button
         type="button"
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -89,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
       </button>
 
       {/* Sidebar Header */}
-      <div className="h-16 flex items-center px-4.5 border-b border-purple-950/80 shrink-0">
+      <div className="h-16 flex items-center px-4 border-b border-purple-950/80 shrink-0">
         {sidebarOpen ? (
           <div className="flex items-center justify-between w-full min-w-0">
             <div className="flex items-center gap-3 min-w-0">
@@ -112,6 +126,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
             <button
               type="button"
               onClick={() => setSidebarOpen(false)}
+              title="Tutup menu navigasi"
+              aria-label="Tutup menu navigasi"
               className="lg:hidden p-1.5 rounded-lg text-purple-300 hover:text-white hover:bg-primary-600 transition-colors shrink-0 cursor-pointer"
             >
               <X size={20} />
@@ -151,17 +167,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
           )}
 
           {!unauthenticated &&
-            menuTree.map((node) => (
-              <MenuNodeItem
-                key={node.id}
-                node={node}
-                isCollapsed={!sidebarOpen}
-                isSubmenu={false}
-                navigate={navigate}
-                setSidebarOpen={setSidebarOpen}
-                location={location}
-              />
-            ))}
+            menuTree.map((node) =>
+              sidebarOpen ? (
+                <ExpandedMenuNodeItem
+                  key={node.id}
+                  node={node}
+                  navigate={navigate}
+                  setSidebarOpen={setSidebarOpen}
+                  location={location}
+                />
+              ) : (
+                <CollapsedMenuItem
+                  key={node.id}
+                  node={node}
+                  navigate={navigate}
+                  setSidebarOpen={setSidebarOpen}
+                  location={location}
+                />
+              )
+            )}
 
           {/* Design System UI Link */}
           <div className="pt-3 mt-3 border-t border-purple-950/80">
@@ -172,10 +196,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
                   navigate('/design-system');
                   if (window.innerWidth < 1024) setSidebarOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all duration-200 cursor-pointer ${location.pathname === '/design-system'
-                  ? 'bg-primary-600 text-white shadow-md shadow-primary-600/30'
-                  : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:shadow-sm hover:shadow-primary-600/20'
-                  }`}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all duration-200 cursor-pointer ${
+                  location.pathname === '/design-system'
+                    ? 'bg-primary-600 text-white shadow-md shadow-primary-600/30'
+                    : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:shadow-sm hover:shadow-primary-600/20'
+                }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <Sparkles size={18} className="text-amber-400 shrink-0" />
@@ -186,22 +211,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
                 </span>
               </button>
             ) : (
-              <div className="relative group flex justify-center py-1">
-                <button
-                  type="button"
-                  onClick={() => navigate('/design-system')}
-                  className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${location.pathname === '/design-system'
-                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/40 scale-105'
-                    : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:scale-105'
-                    }`}
-                >
-                  <Sparkles size={20} className="text-amber-400" />
-                </button>
-                {/* Tooltip on hover */}
-                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-[#180d32] text-white text-xs font-semibold rounded-lg shadow-2xl border border-primary-900/80 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
-                  Design System UI
-                </div>
-              </div>
+              <CollapsedDesignSystemItem
+                location={location}
+                navigate={navigate}
+                setSidebarOpen={setSidebarOpen}
+              />
             )}
           </div>
         </nav>
@@ -210,30 +224,270 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
   );
 };
 
-// Check if any child route is active
-export const hasActiveChildRoute = (node: MenuNode, pathname: string): boolean => {
-  if (!node.submenus || node.submenus.length === 0) return false;
-  return node.submenus.some((child) => {
-    const p = normalizePath(child.link);
-    if (p && (pathname === p || pathname.startsWith(p + '/'))) {
-      return true;
+// =========================================================================
+// COLLAPSED RAIL MODE ITEM (Portal Tooltip & Portal Flyout Submenu)
+// Bypasses parent overflow clipping completely by rendering via React Portal
+// =========================================================================
+
+interface CollapsedMenuItemProps {
+  node: MenuNode;
+  navigate: (path: string) => void;
+  setSidebarOpen: (open: boolean) => void;
+  location: any;
+}
+
+const CollapsedMenuItem: React.FC<CollapsedMenuItemProps> = ({
+  node,
+  navigate,
+  setSidebarOpen,
+  location,
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [coords, setCoords] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const timeoutRef = useRef<any>(null);
+
+  const nodePath = normalizePath(node.link);
+  const hasChildren = !!(node.submenus && node.submenus.length > 0);
+  const isChildActive = hasActiveChildRoute(node, location.pathname);
+
+  const isActive = (): boolean => {
+    if (!nodePath) return false;
+    if (nodePath === '/') {
+      return location.pathname === '/';
     }
-    return hasActiveChildRoute(child, pathname);
-  });
+    return location.pathname === nodePath || location.pathname.startsWith(nodePath + '/');
+  };
+
+  const active = isActive();
+  const highlighted = active || isChildActive;
+
+  const updatePosition = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.top,
+        left: rect.right + 10,
+      });
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    updatePosition();
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 150);
+  };
+
+  const handleFlyoutMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsHovered(true);
+  };
+
+  const handleFlyoutMouseLeave = () => {
+    setIsHovered(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  return (
+    <div
+      className="relative flex justify-center py-1"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={() => {
+          if (!hasChildren && nodePath) {
+            navigate(nodePath);
+            setIsHovered(false);
+            if (window.innerWidth < 1024) setSidebarOpen(false);
+          }
+        }}
+        title={node.nama}
+        aria-label={node.nama}
+        className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${
+          highlighted
+            ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/40 ring-2 ring-primary-400/50 scale-105'
+            : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:scale-105'
+        }`}
+      >
+        <MenuIcon
+          icon={node.icon}
+          name={node.nama}
+          size={20}
+          className={highlighted ? 'text-white' : 'text-purple-200/90 group-hover:text-white'}
+        />
+      </button>
+
+      {/* Portal Tooltip for Leaf Item */}
+      {!hasChildren &&
+        isHovered &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            style={{
+              position: 'fixed',
+              top: coords.top + 8,
+              left: coords.left,
+              zIndex: 9999,
+            }}
+            className="px-3 py-1.5 bg-[#180d32] text-white text-xs font-semibold rounded-lg shadow-2xl border border-primary-900/80 whitespace-nowrap pointer-events-none transition-opacity"
+          >
+            {node.nama}
+          </div>,
+          document.body
+        )}
+
+      {/* Portal Flyout Popover for Group with Submenus */}
+      {hasChildren &&
+        isHovered &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            onMouseEnter={handleFlyoutMouseEnter}
+            onMouseLeave={handleFlyoutMouseLeave}
+            style={{
+              position: 'fixed',
+              top: Math.max(12, Math.min(coords.top, window.innerHeight - 340)),
+              left: coords.left,
+              zIndex: 9999,
+            }}
+            className="min-w-[220px] max-w-[280px] bg-[#180d32] border border-primary-900/80 rounded-xl shadow-2xl py-2 px-1 text-white transition-all animate-fadeIn"
+          >
+            <div className="px-3 py-2 border-b border-primary-900/60 mb-1 flex items-center gap-2">
+              <MenuIcon icon={node.icon} name={node.nama} size={15} className="text-amber-400" />
+              <span className="font-bold text-xs text-white uppercase tracking-wider truncate">
+                {node.nama}
+              </span>
+            </div>
+            <div className="space-y-0.5 max-h-[60vh] overflow-y-auto custom-scrollbar">
+              {node.submenus!.map((sub) => {
+                const subPath = normalizePath(sub.link);
+                const isSubActive =
+                  subPath &&
+                  (location.pathname === subPath || location.pathname.startsWith(subPath + '/'));
+                return (
+                  <button
+                    key={sub.id}
+                    type="button"
+                    onClick={() => {
+                      if (subPath) {
+                        navigate(subPath);
+                        setIsHovered(false);
+                        if (window.innerWidth < 1024) setSidebarOpen(false);
+                      }
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left cursor-pointer ${
+                      isSubActive
+                        ? 'bg-primary-600 text-white font-bold shadow-xs'
+                        : 'text-purple-200/90 hover:bg-primary-600 hover:text-white'
+                    }`}
+                  >
+                    <MenuIcon icon={sub.icon} name={sub.nama} size={15} />
+                    <span className="truncate">{sub.nama}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>,
+          document.body
+        )}
+    </div>
+  );
 };
 
-interface MenuNodeItemProps {
+// =========================================================================
+// COLLAPSED DESIGN SYSTEM ITEM (Portal Tooltip)
+// =========================================================================
+
+const CollapsedDesignSystemItem: React.FC<{
+  location: any;
+  navigate: (path: string) => void;
+  setSidebarOpen: (open: boolean) => void;
+}> = ({ location, navigate, setSidebarOpen }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [coords, setCoords] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const isActive = location.pathname === '/design-system';
+
+  return (
+    <div
+      className="relative flex justify-center py-1"
+      onMouseEnter={() => {
+        if (buttonRef.current) {
+          const rect = buttonRef.current.getBoundingClientRect();
+          setCoords({ top: rect.top, left: rect.right + 10 });
+        }
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={() => {
+          navigate('/design-system');
+          setIsHovered(false);
+          if (window.innerWidth < 1024) setSidebarOpen(false);
+        }}
+        title="Design System UI"
+        aria-label="Design System UI"
+        className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${
+          isActive
+            ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/40 scale-105'
+            : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:scale-105'
+        }`}
+      >
+        <Sparkles size={20} className="text-amber-400" />
+      </button>
+
+      {isHovered &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            style={{
+              position: 'fixed',
+              top: coords.top + 8,
+              left: coords.left,
+              zIndex: 9999,
+            }}
+            className="px-3 py-1.5 bg-[#180d32] text-white text-xs font-semibold rounded-lg shadow-2xl border border-primary-900/80 whitespace-nowrap pointer-events-none transition-opacity"
+          >
+            Design System UI
+          </div>,
+          document.body
+        )}
+    </div>
+  );
+};
+
+// =========================================================================
+// EXPANDED MODE ITEM (Full Accordion Menu)
+// =========================================================================
+
+interface ExpandedMenuNodeItemProps {
   node: MenuNode;
-  isCollapsed: boolean;
   isSubmenu?: boolean;
   navigate: (path: string) => void;
   setSidebarOpen: (open: boolean) => void;
   location: any;
 }
 
-const MenuNodeItem: React.FC<MenuNodeItemProps> = ({
+const ExpandedMenuNodeItem: React.FC<ExpandedMenuNodeItemProps> = ({
   node,
-  isCollapsed,
   isSubmenu = false,
   navigate,
   setSidebarOpen,
@@ -257,96 +511,11 @@ const MenuNodeItem: React.FC<MenuNodeItemProps> = ({
     if (isChildActive) {
       setOpen(true);
     }
-  }, [location.pathname]);
+  }, [location.pathname, isChildActive]);
 
   const active = isActive();
 
-  // COLLAPSED RAIL MODE (Desktop icon bar)
-  if (isCollapsed) {
-    if (!hasChildren) {
-      return (
-        <div className="relative group flex justify-center py-1">
-          <button
-            type="button"
-            onClick={() => {
-              if (nodePath) navigate(nodePath);
-            }}
-            className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${active
-              ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/40 ring-2 ring-primary-400/50 scale-105'
-              : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:scale-105'
-              }`}
-          >
-            <MenuIcon
-              icon={node.icon}
-              name={node.nama}
-              size={20}
-              className={active ? 'text-white' : 'text-purple-200/90 group-hover:text-white'}
-            />
-          </button>
-          {/* Tooltip on hover */}
-          <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-[#180d32] text-white text-xs font-semibold rounded-lg shadow-2xl border border-primary-900/80 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
-            {node.nama}
-          </div>
-        </div>
-      );
-    }
-
-    // Has Children in Collapsed Mode -> Flyout Popover on hover
-    return (
-      <div className="relative group flex justify-center py-1">
-        <button
-          type="button"
-          className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${isChildActive
-            ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/40 ring-2 ring-primary-400/50 scale-105'
-            : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:scale-105'
-            }`}
-        >
-          <MenuIcon
-            icon={node.icon}
-            name={node.nama}
-            size={20}
-            className={isChildActive ? 'text-white' : 'text-purple-200/90 group-hover:text-white'}
-          />
-        </button>
-
-        {/* Floating Flyout Menu on Hover */}
-        <div className="absolute left-full top-0 ml-3 min-w-[210px] bg-[#180d32] border border-primary-900/60 rounded-xl shadow-2xl py-2 px-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all z-50">
-          <div className="px-3 py-2 border-b border-primary-900/60 mb-1 flex items-center gap-2">
-            <MenuIcon icon={node.icon} name={node.nama} size={15} className="text-amber-400" />
-            <span className="font-bold text-xs text-white uppercase tracking-wider">
-              {node.nama}
-            </span>
-          </div>
-          <div className="space-y-0.5">
-            {node.submenus!.map((sub) => {
-              const subPath = normalizePath(sub.link);
-              const isSubActive =
-                subPath &&
-                (location.pathname === subPath || location.pathname.startsWith(subPath + '/'));
-              return (
-                <button
-                  key={sub.id}
-                  type="button"
-                  onClick={() => {
-                    if (subPath) navigate(subPath);
-                  }}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left cursor-pointer ${isSubActive
-                    ? 'bg-primary-600 text-white font-bold shadow-xs'
-                    : 'text-purple-200/90 hover:bg-primary-600 hover:text-white'
-                    }`}
-                >
-                  <MenuIcon icon={sub.icon} name={sub.nama} size={15} />
-                  <span className="truncate">{sub.nama}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // EXPANDED MODE - Leaf item (No children)
+  // Leaf item (No children)
   if (!hasChildren) {
     return (
       <button
@@ -357,26 +526,30 @@ const MenuNodeItem: React.FC<MenuNodeItemProps> = ({
             if (window.innerWidth < 1024) setSidebarOpen(false);
           }
         }}
-        className={`w-full flex items-center justify-between transition-all duration-200 cursor-pointer ${isSubmenu
-          ? `px-3 py-2 rounded-lg text-[13px] font-medium ${active
-            ? 'bg-primary-600 text-white font-semibold shadow-sm shadow-primary-600/30'
-            : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:translate-x-1'
-          }`
-          : `px-3.5 py-2.5 rounded-xl text-[14px] font-semibold tracking-wide ${active
-            ? 'bg-primary-600 text-white font-bold shadow-md shadow-primary-600/40 ring-1 ring-primary-500/50'
-            : 'text-purple-100 hover:bg-primary-600 hover:text-white hover:shadow-sm hover:shadow-primary-600/20'
-          }`
-          }`}
+        className={`w-full flex items-center justify-between transition-all duration-200 cursor-pointer ${
+          isSubmenu
+            ? `px-3 py-2 rounded-lg text-[13px] font-medium ${
+                active
+                  ? 'bg-primary-600 text-white font-semibold shadow-sm shadow-primary-600/30'
+                  : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:translate-x-1'
+              }`
+            : `px-3.5 py-2.5 rounded-xl text-[14px] font-semibold tracking-wide ${
+                active
+                  ? 'bg-primary-600 text-white font-bold shadow-md shadow-primary-600/40 ring-1 ring-primary-500/50'
+                  : 'text-purple-100 hover:bg-primary-600 hover:text-white hover:shadow-sm hover:shadow-primary-600/20'
+              }`
+        }`}
       >
         <div className="flex items-center gap-3 min-w-0">
           <MenuIcon
             icon={node.icon}
             name={node.nama}
             size={isSubmenu ? 15 : 19}
-            className={`${active
-              ? 'text-white shrink-0 drop-shadow-xs'
-              : 'text-purple-200/80 shrink-0 group-hover:text-white'
-              }`}
+            className={`${
+              active
+                ? 'text-white shrink-0 drop-shadow-xs'
+                : 'text-purple-200/80 shrink-0 group-hover:text-white'
+            }`}
           />
           <span className="truncate">{node.nama}</span>
         </div>
@@ -384,26 +557,28 @@ const MenuNodeItem: React.FC<MenuNodeItemProps> = ({
     );
   }
 
-  // EXPANDED MODE - Group with Children (Accordion)
+  // Group with Children (Accordion)
   return (
     <div className="space-y-1">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[14px] font-semibold tracking-wide transition-all duration-200 cursor-pointer ${open || isChildActive
-          ? 'bg-primary-900/40 text-white border-l-3 border-primary-500 shadow-xs'
-          : 'text-purple-100 hover:bg-primary-600 hover:text-white'
-          }`}
+        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[14px] font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
+          open || isChildActive
+            ? 'bg-primary-900/40 text-white border-l-[3px] border-primary-500 shadow-xs'
+            : 'text-purple-100 hover:bg-primary-600 hover:text-white'
+        }`}
       >
         <div className="flex items-center gap-3 min-w-0">
           <MenuIcon
             icon={node.icon}
             name={node.nama}
             size={19}
-            className={`${isChildActive || open
-              ? 'text-primary-400 shrink-0'
-              : 'text-purple-200/80 shrink-0'
-              }`}
+            className={`${
+              isChildActive || open
+                ? 'text-primary-400 shrink-0'
+                : 'text-purple-200/80 shrink-0'
+            }`}
           />
           <span className="truncate">{node.nama}</span>
         </div>
@@ -415,14 +590,12 @@ const MenuNodeItem: React.FC<MenuNodeItemProps> = ({
       </button>
 
       {open && (
-        <div className="pl-3.5 ml-4.5 mt-1.5 space-y-1 border-l-2 border-primary-600/30">
+        <div className="pl-3.5 ml-4 mt-1.5 space-y-1 border-l-2 border-primary-600/30">
           {node.submenus!.map((sub) => (
-            <MenuNodeItem
+            <ExpandedMenuNodeItem
               key={sub.id}
               node={sub}
-              isCollapsed={false}
               isSubmenu={true}
-
               navigate={navigate}
               setSidebarOpen={setSidebarOpen}
               location={location}

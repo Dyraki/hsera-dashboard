@@ -4,7 +4,8 @@ import {
   Bell,
   ChevronDown,
   LogOut,
-  Building2
+  Building2,
+  Menu
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -12,16 +13,27 @@ interface HeaderProps {
   setSidebarOpen?: (open: boolean) => void;
 }
 
-export const Header: React.FC<HeaderProps> = () => {
+export const Header: React.FC<HeaderProps> = ({ sidebarOpen = false, setSidebarOpen }) => {
   const { user, logout } = useAuth();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
 
   return (
-    <header className="h-16 shrink-0 bg-white border-b border-gray-200 sticky top-0 z-30 flex items-center justify-between px-6 lg:px-8 shadow-xs">
+    <header className="h-16 shrink-0 bg-white border-b border-gray-200 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
       
-      {/* Header Left */}
+      {/* Header Left (Sidebar Toggle Button & App Context) */}
       <div className="flex items-center gap-3">
+        {setSidebarOpen && (
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 -ml-1 sm:ml-0 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            title={sidebarOpen ? "Perkecil / Tutup menu navigasi" : "Perluas / Buka menu navigasi"}
+            aria-label="Toggle menu navigasi"
+          >
+            <Menu size={22} className="stroke-[2.2]" />
+          </button>
+        )}
       </div>
 
       {/* Header Right (Actions & Avatar) */}

@@ -78,17 +78,18 @@ export const useCallsheetForm = () => {
 
       // Populate form state from rekap
       const r = data.rekap;
+      const initialKunjungan = r?.jumlahKunjungan || 0;
       setRekapId(r?.id);
       setJenisRekap(r?.jenisRekap || "NORMAL");
       setAlasan(r?.alasan || "");
-      setJumlahKunjungan(r?.jumlahKunjungan || 0);
+      setJumlahKunjungan(initialKunjungan);
       setTotalEc(r?.totalEc || 0);
       setBdOutlet(r?.bdOutlet || 0);
       setVolumeGg(r?.volumeGg != null ? String(r.volumeGg) : "");
       setCatatan(r?.catatan || "");
       setStatusRekap(r?.statusRekap || "DRAFT");
 
-      // Build full initial matrix with BD computed
+      // Build full initial matrix with BD and BPJ computed
       const newMatrix: Record<string, Record<string, number>> = {};
       const rawMatrix = r?.matrix || {};
 
@@ -100,12 +101,14 @@ export const useCallsheetForm = () => {
         const sd = Number(row["SD"]) || 0;
         const sb = Number(row["SB"]) || 0;
         const tl = Number(row["TL"]) || 0;
-        const bpj = Number(row["BPJ"]) || 0;
         const stock = Number(row["STOCK"]) || 0;
         const buy = Number(row["BUY"]) || 0;
         const fu = Number(row["FACE_UP"]) || 0;
 
         const bd = oos + sk + sl + sd + sb;
+        const sumOthers = sk + sl + sd + oos + sb + tl;
+        // Rumus: BPJ = Jumlah Kunjungan - (SK + SL + SD + OOS + SB + TL)
+        const bpj = initialKunjungan > 0 ? Math.max(0, initialKunjungan - sumOthers) : (Number(row["BPJ"]) || 0);
 
         newMatrix[brand.id] = {
           OOS: oos,
@@ -135,6 +138,32 @@ export const useCallsheetForm = () => {
     loadFormData();
   }, [loadFormData]);
 
+  // Handle Jumlah Kunjungan Change & Live Recalculate BPJ for all brands
+  const handleJumlahKunjunganChange = useCallback((newKunjungan: number) => {
+    const val = Math.max(0, newKunjungan);
+    setJumlahKunjungan(val);
+
+    setMatrix((prev) => {
+      const updated: Record<string, Record<string, number>> = {};
+      for (const [brandId, row] of Object.entries(prev)) {
+        const oos = row["OOS"] || 0;
+        const sk = row["SK"] || 0;
+        const sl = row["SL"] || 0;
+        const sd = row["SD"] || 0;
+        const sb = row["SB"] || 0;
+        const tl = row["TL"] || 0;
+        const sumOthers = sk + sl + sd + oos + sb + tl;
+        const bpj = val > 0 ? Math.max(0, val - sumOthers) : 0;
+
+        updated[brandId] = {
+          ...row,
+          BPJ: bpj,
+        };
+      }
+      return updated;
+    });
+  }, []);
+
   // Handle Matrix Cell Input Change
   const handleCellChange = useCallback((brandId: string, notasiKode: string, val: number) => {
     if (formSkeleton?.isLocked) return;
@@ -151,12 +180,17 @@ export const useCallsheetForm = () => {
       const sb = currentRow["SB"] || 0;
       currentRow["BD"] = oos + sk + sl + sd + sb;
 
+      // Auto-compute BPJ = Jumlah Kunjungan - (SK + SL + SD + OOS + SB + TL)
+      const tl = currentRow["TL"] || 0;
+      const sumOthers = sk + sl + sd + oos + sb + tl;
+      currentRow["BPJ"] = jumlahKunjungan > 0 ? Math.max(0, jumlahKunjungan - sumOthers) : 0;
+
       return {
         ...prev,
         [brandId]: currentRow,
       };
     });
-  }, [formSkeleton]);
+  }, [formSkeleton, jumlahKunjungan]);
 
   // Live Row Validations
   const rowValidations = useMemo<RowValidationResult[]>(() => {
@@ -221,20 +255,20 @@ export const useCallsheetForm = () => {
   }, [rowValidations, matrix]);
 
   // Save submission helper
-  const submitCallsheet = async (targetStatus: StatusRekap) => {
+  const submitCallsheet = async (targetStatus: StatusRekap): Promise<boolean> => {
     if (!selectedDistrictId || !selectedDate) {
       showToast("error", "Distrik dan Tanggal wajib dipilih.");
-      return;
+      return false;
     }
 
     if (formSkeleton?.isLocked) {
       showToast("error", "Minggu ini telah dikunci untuk audit. Data tidak dapat disimpan.");
-      return;
+      return false;
     }
 
     if (jenisRekap === "TIDAK_ADA_KUNJUNGAN" && (!alasan || alasan.trim().length === 0)) {
       showToast("error", "Alasan wajib diisi jika memilih opsi Tidak Ada Kunjungan.");
-      return;
+      return false;
     }
 
     setIsSubmitting(true);
@@ -277,8 +311,10 @@ export const useCallsheetForm = () => {
           : "Draft Callsheet berhasil disimpan!"
       );
       await loadFormData();
+      return true;
     } catch (err: any) {
       showToast("error", err.message || "Gagal menyimpan callsheet.");
+      return false;
     } finally {
       setIsSubmitting(false);
     }
@@ -319,7 +355,7 @@ export const useCallsheetForm = () => {
     alasan,
     setAlasan,
     jumlahKunjungan,
-    setJumlahKunjungan,
+    setJumlahKunjungan: handleJumlahKunjunganChange,
     totalEc,
     setTotalEc,
     bdOutlet,

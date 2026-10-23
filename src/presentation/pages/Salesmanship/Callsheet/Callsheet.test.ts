@@ -69,4 +69,43 @@ describe("Callsheet Matrix Calculations", () => {
     expect(totalBuy).toBe(6);
     expect(totalFu).toBe(10);
   });
+
+  it("should auto-calculate BPJ as jumlahKunjungan - (SK + SL + SD + OOS + SB + TL)", () => {
+    const jumlahKunjungan = 30;
+    const row = {
+      SK: 10,
+      SL: 5,
+      SD: 3,
+      OOS: 2,
+      SB: 4,
+      TL: 1,
+    };
+    const sumOthers = row.SK + row.SL + row.SD + row.OOS + row.SB + row.TL; // 25
+    const bpj = Math.max(0, jumlahKunjungan - sumOthers);
+    expect(bpj).toBe(5);
+
+    const totalStatus = sumOthers + bpj;
+    expect(totalStatus).toBe(30);
+    expect(totalStatus - jumlahKunjungan).toBe(0);
+  });
+
+  it("should clamp BPJ to 0 when status sum exceeds jumlahKunjungan and flag over error", () => {
+    const jumlahKunjungan = 30;
+    const row = {
+      SK: 15,
+      SL: 10,
+      SD: 5,
+      OOS: 2,
+      SB: 2,
+      TL: 1, // 35
+    };
+    const sumOthers = row.SK + row.SL + row.SD + row.OOS + row.SB + row.TL;
+    const bpj = Math.max(0, jumlahKunjungan - sumOthers);
+    expect(bpj).toBe(0);
+
+    const totalStatus = sumOthers + bpj;
+    const diff = totalStatus - jumlahKunjungan;
+    expect(diff).toBe(5);
+    expect(diff > 0).toBe(true);
+  });
 });

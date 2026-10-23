@@ -39,6 +39,9 @@ export const CallsheetKpiCards: React.FC<CallsheetKpiCardsProps> = ({
 
   const ecRate = jumlahKunjungan > 0 ? ((totalEc / jumlahKunjungan) * 100).toFixed(1) : "0.0";
   const bdRate = jumlahKunjungan > 0 ? ((bdOutlet / jumlahKunjungan) * 100).toFixed(1) : "0.0";
+  const numVolume = Number(volumeGg) || 0;
+  const targetVolume = targets.volume ?? 140;
+  const volumeRate = targetVolume > 0 ? ((numVolume / targetVolume) * 100).toFixed(1) : "0.0";
 
   return (
     <div className="space-y-3">
@@ -150,9 +153,14 @@ export const CallsheetKpiCards: React.FC<CallsheetKpiCardsProps> = ({
               <Package className="w-4 h-4 text-sky-600 shrink-0" />
               Volume Total (Pack)
             </span>
-            <span className="text-xs font-medium text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-200 shrink-0">
-              Auto
-            </span>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs font-medium text-gray-700 bg-gray-100 px-2.5 py-0.5 rounded-md border border-gray-200">
+                Target: {targetVolume}
+              </span>
+              <span className="text-xs font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-200">
+                {volumeRate}%
+              </span>
+            </div>
           </div>
           <div className="flex items-baseline gap-3 mt-3">
             <div className="w-28 sm:w-32 shrink-0">
@@ -165,9 +173,14 @@ export const CallsheetKpiCards: React.FC<CallsheetKpiCardsProps> = ({
                 className="w-full bg-sky-50/50 border border-sky-200 rounded-lg px-3 py-2 text-2xl font-bold text-sky-950 text-center font-mono shadow-xs cursor-default disabled:opacity-50"
               />
             </div>
-            <span className="text-sm font-medium text-gray-600 truncate">
-              Pack
-            </span>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-gray-600 truncate">
+                Pack
+              </span>
+              <span className="text-[10px] text-sky-600 font-medium tracking-tight">
+                Auto-sum
+              </span>
+            </div>
           </div>
         </div>
       </div>
