@@ -203,4 +203,22 @@ export class HttpSalesmanshipRepository implements ISalesmanshipRepository {
     }>(`/api/salesmanship/reports/available-weeks${queryStr}`);
     return res.data.data;
   }
+
+  async getDashboard(
+    filter?: import('../../domain/models/Dashboard').DashboardFilterQuery
+  ): Promise<import('../../domain/models/Dashboard').DashboardDTO> {
+    const params = new URLSearchParams();
+    if (filter?.tahun) params.append('tahun', String(filter.tahun));
+    if (filter?.kuartal) params.append('kuartal', String(filter.kuartal));
+    if (filter?.kodeMinggu !== undefined && filter?.kodeMinggu !== null) params.append('kodeMinggu', String(filter.kodeMinggu));
+    if (filter?.ouKode && filter.ouKode !== 'ALL') params.append('ouKode', filter.ouKode);
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+
+    const res = await SalesmanshipHttpClient.get<{
+      success: boolean;
+      data: import('../../domain/models/Dashboard').DashboardDTO;
+    }>(`/api/salesmanship/dashboard${queryStr}`);
+    return res.data.data;
+  }
 }
+

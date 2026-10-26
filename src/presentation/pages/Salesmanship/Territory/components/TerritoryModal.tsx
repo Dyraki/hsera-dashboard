@@ -243,7 +243,7 @@ export const TerritoryModal: React.FC<TerritoryModalProps> = ({
             <option value="" disabled>-- Pilih Salesman Lapangan --</option>
             {filteredSalesmen.map((sm) => (
               <option key={sm.id} value={sm.id}>
-                {sm.namaLengkap} {sm.nik ? `(NIK: ${sm.nik})` : ''} {sm.ouKode ? `[${sm.ouKode}]` : ''}
+                {sm.namaLengkap} {sm.employeeNumber ? `(NIP: ${sm.employeeNumber})` : sm.nik ? `(NIK: ${sm.nik})` : ''} {sm.ouKode ? `[${sm.ouKode}]` : ''}
               </option>
             ))}
           </select>

@@ -30,6 +30,12 @@ export const WeeklyBrandMatrixTable: React.FC<WeeklyBrandMatrixTableProps> = ({ 
     return colors[index % colors.length];
   };
 
+  const getNotationColor = (percent: number) => {
+    if (percent > 50) return 'text-rose-600 font-bold';
+    if (percent >= 25) return 'text-amber-600 font-bold';
+    return 'text-emerald-700 font-bold';
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs space-y-4">
       {/* Top Header */}
@@ -148,33 +154,25 @@ export const WeeklyBrandMatrixTable: React.FC<WeeklyBrandMatrixTableProps> = ({ 
                 </td>
 
                 {/* Notasi % Columns */}
-                <td className="py-2 px-1 text-center border-r border-gray-200 text-gray-700">
-                  {b.notasi.skPercent > 0 ? (
-                    <span className="font-semibold text-rose-600">{b.notasi.skPercent}%</span>
-                  ) : (
-                    <span className="text-gray-400">0%</span>
-                  )}
+                <td className={`py-2 px-1 text-center border-r border-gray-200 font-mono ${getNotationColor(b.notasi.skPercent)}`}>
+                  {b.notasi.skPercent}%
                 </td>
-                <td className="py-2 px-1 text-center border-r border-gray-200 text-gray-900 font-bold">
+                <td className={`py-2 px-1 text-center border-r border-gray-200 font-mono ${getNotationColor(b.notasi.slPercent)}`}>
                   {b.notasi.slPercent}%
                 </td>
-                <td className="py-2 px-1 text-center border-r border-gray-200 text-gray-800">
+                <td className={`py-2 px-1 text-center border-r border-gray-200 font-mono ${getNotationColor(b.notasi.sdPercent)}`}>
                   {b.notasi.sdPercent}%
                 </td>
-                <td className="py-2 px-1 text-center border-r border-gray-200">
-                  {b.notasi.oosPercent > 0 ? (
-                    <span className="font-bold text-rose-600">{b.notasi.oosPercent}%</span>
-                  ) : (
-                    <span className="text-gray-400">0%</span>
-                  )}
+                <td className={`py-2 px-1 text-center border-r border-gray-200 font-mono ${getNotationColor(b.notasi.oosPercent)}`}>
+                  {b.notasi.oosPercent}%
                 </td>
-                <td className="py-2 px-1 text-center border-r border-gray-200 text-gray-700">
+                <td className={`py-2 px-1 text-center border-r border-gray-200 font-mono ${getNotationColor(b.notasi.sbPercent)}`}>
                   {b.notasi.sbPercent}%
                 </td>
-                <td className="py-2 px-1 text-center border-r border-gray-200 text-gray-600">
+                <td className={`py-2 px-1 text-center border-r border-gray-200 font-mono ${getNotationColor(b.notasi.tlPercent)}`}>
                   {b.notasi.tlPercent}%
                 </td>
-                <td className="py-2 px-1 text-center border-r border-gray-200 text-sky-700 font-semibold">
+                <td className={`py-2 px-1 text-center border-r border-gray-200 font-mono ${getNotationColor(b.notasi.bpjPercent)}`}>
                   {b.notasi.bpjPercent}%
                 </td>
 
@@ -210,25 +208,25 @@ export const WeeklyBrandMatrixTable: React.FC<WeeklyBrandMatrixTableProps> = ({ 
               </td>
 
               {/* Notasi Averages */}
-              <td className="py-3 px-1 text-center border-r border-gray-300 text-rose-600">
+              <td className={`py-3 px-1 text-center border-r border-gray-300 font-mono ${getNotationColor(summaryRow.skPercent)}`}>
                 {summaryRow.skPercent}%
               </td>
-              <td className="py-3 px-1 text-center border-r border-gray-300 text-gray-950">
+              <td className={`py-3 px-1 text-center border-r border-gray-300 font-mono ${getNotationColor(summaryRow.slPercent)}`}>
                 {summaryRow.slPercent}%
               </td>
-              <td className="py-3 px-1 text-center border-r border-gray-300 text-gray-800">
+              <td className={`py-3 px-1 text-center border-r border-gray-300 font-mono ${getNotationColor(summaryRow.sdPercent)}`}>
                 {summaryRow.sdPercent}%
               </td>
-              <td className="py-3 px-1 text-center border-r border-gray-300 text-rose-600">
+              <td className={`py-3 px-1 text-center border-r border-gray-300 font-mono ${getNotationColor(summaryRow.oosPercent)}`}>
                 {summaryRow.oosPercent}%
               </td>
-              <td className="py-3 px-1 text-center border-r border-gray-300 text-gray-700">
+              <td className={`py-3 px-1 text-center border-r border-gray-300 font-mono ${getNotationColor(summaryRow.sbPercent)}`}>
                 {summaryRow.sbPercent}%
               </td>
-              <td className="py-3 px-1 text-center border-r border-gray-300 text-gray-600">
+              <td className={`py-3 px-1 text-center border-r border-gray-300 font-mono ${getNotationColor(summaryRow.tlPercent)}`}>
                 {summaryRow.tlPercent}%
               </td>
-              <td className="py-3 px-1 text-center border-r border-gray-300 text-sky-700">
+              <td className={`py-3 px-1 text-center border-r border-gray-300 font-mono ${getNotationColor(summaryRow.bpjPercent)}`}>
                 {summaryRow.bpjPercent}%
               </td>
 

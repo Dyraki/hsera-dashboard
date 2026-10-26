@@ -171,11 +171,28 @@ export const MonitoringWeekFilter: React.FC<MonitoringWeekFilterProps> = ({
             {filters.ouKode !== "all" && !operationUnits.some((ou) => ou.kode === filters.ouKode) && (
               <option value={filters.ouKode}>{filters.ouKode}</option>
             )}
-            {operationUnits.map((ou) => (
-              <option key={ou.id} value={ou.kode}>
-                {ou.kode} – {ou.nama}
-              </option>
-            ))}
+            {/* Opsi Area Office (Induk Multi-Cabang) */}
+            {operationUnits.some((ou) => ou.type === "AREA_OFFICE") && (
+              <optgroup label="Area Office (Semua Cabang di Bawahnya)">
+                {operationUnits
+                  .filter((ou) => ou.type === "AREA_OFFICE")
+                  .map((ou) => (
+                    <option key={ou.id} value={ou.kode}>
+                      {ou.kode} – {ou.nama} (Semua Cabang)
+                    </option>
+                  ))}
+              </optgroup>
+            )}
+            {/* Opsi Cabang Operasional Mandiri */}
+            <optgroup label="Cabang Operasional Mandiri">
+              {operationUnits
+                .filter((ou) => ou.type !== "AREA_OFFICE")
+                .map((ou) => (
+                  <option key={ou.id} value={ou.kode}>
+                    {ou.kode} – {ou.nama}
+                  </option>
+                ))}
+            </optgroup>
           </select>
         </div>
 

@@ -7,7 +7,6 @@ import {
   ChevronUp,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
   X
 } from 'lucide-react';
 import { MenuNode } from '../../../core/domain/models/Management';
@@ -81,11 +80,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
 
   return (
     <aside
-      className={`z-50 flex flex-col bg-[#160a34] text-bodydark1 border-r border-purple-950/60 shadow-2xl transition-[width,transform] duration-300 ease-in-out ${
-        sidebarOpen
-          ? 'w-72 max-w-[85vw] translate-x-0'
-          : '-translate-x-full lg:translate-x-0 lg:w-20'
-      } fixed inset-y-0 left-0 lg:relative lg:shrink-0 h-full`}
+      className={`z-50 flex flex-col bg-[#160a34] text-bodydark1 border-r border-purple-950/60 shadow-2xl transition-[width,transform] duration-300 ease-in-out ${sidebarOpen
+        ? 'w-72 max-w-[85vw] translate-x-0'
+        : '-translate-x-full lg:translate-x-0 lg:w-20'
+        } fixed inset-y-0 left-0 lg:relative lg:shrink-0 h-full`}
     >
       {/* Floating Circular Toggle Button on the Right Edge (Desktop only) */}
       <button
@@ -117,7 +115,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
                   HSERA PLATFORM
                 </h1>
                 <span className="text-[10px] text-amber-400 font-bold tracking-widest uppercase mt-0.5 block">
-                  ENTERPRISE
+                  AO Tulungagung
                 </span>
               </div>
             </div>
@@ -186,38 +184,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen })
                 />
               )
             )}
-
-          {/* Design System UI Link */}
-          <div className="pt-3 mt-3 border-t border-purple-950/80">
-            {sidebarOpen ? (
-              <button
-                type="button"
-                onClick={() => {
-                  navigate('/design-system');
-                  if (window.innerWidth < 1024) setSidebarOpen(false);
-                }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all duration-200 cursor-pointer ${
-                  location.pathname === '/design-system'
-                    ? 'bg-primary-600 text-white shadow-md shadow-primary-600/30'
-                    : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:shadow-sm hover:shadow-primary-600/20'
-                }`}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <Sparkles size={18} className="text-amber-400 shrink-0" />
-                  <span className="truncate">Design System UI</span>
-                </div>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30 font-bold">
-                  v1
-                </span>
-              </button>
-            ) : (
-              <CollapsedDesignSystemItem
-                location={location}
-                navigate={navigate}
-                setSidebarOpen={setSidebarOpen}
-              />
-            )}
-          </div>
         </nav>
       </div>
     </aside>
@@ -253,8 +219,8 @@ const CollapsedMenuItem: React.FC<CollapsedMenuItemProps> = ({
 
   const isActive = (): boolean => {
     if (!nodePath) return false;
-    if (nodePath === '/') {
-      return location.pathname === '/';
+    if (nodePath === '/' || nodePath === '/dashboard') {
+      return location.pathname === '/' || location.pathname === '/dashboard';
     }
     return location.pathname === nodePath || location.pathname.startsWith(nodePath + '/');
   };
@@ -317,11 +283,10 @@ const CollapsedMenuItem: React.FC<CollapsedMenuItemProps> = ({
         }}
         title={node.nama}
         aria-label={node.nama}
-        className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${
-          highlighted
-            ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/40 ring-2 ring-primary-400/50 scale-105'
-            : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:scale-105'
-        }`}
+        className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${highlighted
+          ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/40 ring-2 ring-primary-400/50 scale-105'
+          : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:scale-105'
+          }`}
       >
         <MenuIcon
           icon={node.icon}
@@ -389,11 +354,10 @@ const CollapsedMenuItem: React.FC<CollapsedMenuItemProps> = ({
                         if (window.innerWidth < 1024) setSidebarOpen(false);
                       }
                     }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left cursor-pointer ${
-                      isSubActive
-                        ? 'bg-primary-600 text-white font-bold shadow-xs'
-                        : 'text-purple-200/90 hover:bg-primary-600 hover:text-white'
-                    }`}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left cursor-pointer ${isSubActive
+                      ? 'bg-primary-600 text-white font-bold shadow-xs'
+                      : 'text-purple-200/90 hover:bg-primary-600 hover:text-white'
+                      }`}
                   >
                     <MenuIcon icon={sub.icon} name={sub.nama} size={15} />
                     <span className="truncate">{sub.nama}</span>
@@ -401,72 +365,6 @@ const CollapsedMenuItem: React.FC<CollapsedMenuItemProps> = ({
                 );
               })}
             </div>
-          </div>,
-          document.body
-        )}
-    </div>
-  );
-};
-
-// =========================================================================
-// COLLAPSED DESIGN SYSTEM ITEM (Portal Tooltip)
-// =========================================================================
-
-const CollapsedDesignSystemItem: React.FC<{
-  location: any;
-  navigate: (path: string) => void;
-  setSidebarOpen: (open: boolean) => void;
-}> = ({ location, navigate, setSidebarOpen }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [coords, setCoords] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
-  const buttonRef = useRef<HTMLButtonElement>(null);
-
-  const isActive = location.pathname === '/design-system';
-
-  return (
-    <div
-      className="relative flex justify-center py-1"
-      onMouseEnter={() => {
-        if (buttonRef.current) {
-          const rect = buttonRef.current.getBoundingClientRect();
-          setCoords({ top: rect.top, left: rect.right + 10 });
-        }
-        setIsHovered(true);
-      }}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <button
-        ref={buttonRef}
-        type="button"
-        onClick={() => {
-          navigate('/design-system');
-          setIsHovered(false);
-          if (window.innerWidth < 1024) setSidebarOpen(false);
-        }}
-        title="Design System UI"
-        aria-label="Design System UI"
-        className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${
-          isActive
-            ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/40 scale-105'
-            : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:scale-105'
-        }`}
-      >
-        <Sparkles size={20} className="text-amber-400" />
-      </button>
-
-      {isHovered &&
-        typeof document !== 'undefined' &&
-        createPortal(
-          <div
-            style={{
-              position: 'fixed',
-              top: coords.top + 8,
-              left: coords.left,
-              zIndex: 9999,
-            }}
-            className="px-3 py-1.5 bg-[#180d32] text-white text-xs font-semibold rounded-lg shadow-2xl border border-primary-900/80 whitespace-nowrap pointer-events-none transition-opacity"
-          >
-            Design System UI
           </div>,
           document.body
         )}
@@ -499,8 +397,8 @@ const ExpandedMenuNodeItem: React.FC<ExpandedMenuNodeItemProps> = ({
 
   const isActive = (): boolean => {
     if (!nodePath) return false;
-    if (nodePath === '/') {
-      return location.pathname === '/';
+    if (nodePath === '/' || nodePath === '/dashboard') {
+      return location.pathname === '/' || location.pathname === '/dashboard';
     }
     return location.pathname === nodePath || location.pathname.startsWith(nodePath + '/');
   };
@@ -526,30 +424,26 @@ const ExpandedMenuNodeItem: React.FC<ExpandedMenuNodeItemProps> = ({
             if (window.innerWidth < 1024) setSidebarOpen(false);
           }
         }}
-        className={`w-full flex items-center justify-between transition-all duration-200 cursor-pointer ${
-          isSubmenu
-            ? `px-3 py-2 rounded-lg text-[13px] font-medium ${
-                active
-                  ? 'bg-primary-600 text-white font-semibold shadow-sm shadow-primary-600/30'
-                  : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:translate-x-1'
-              }`
-            : `px-3.5 py-2.5 rounded-xl text-[14px] font-semibold tracking-wide ${
-                active
-                  ? 'bg-primary-600 text-white font-bold shadow-md shadow-primary-600/40 ring-1 ring-primary-500/50'
-                  : 'text-purple-100 hover:bg-primary-600 hover:text-white hover:shadow-sm hover:shadow-primary-600/20'
-              }`
-        }`}
+        className={`w-full flex items-center justify-between transition-all duration-200 cursor-pointer ${isSubmenu
+          ? `px-3 py-2 rounded-lg text-[13px] font-medium ${active
+            ? 'bg-primary-600 text-white font-semibold shadow-sm shadow-primary-600/30'
+            : 'text-purple-200/80 hover:bg-primary-600 hover:text-white hover:translate-x-1'
+          }`
+          : `px-3.5 py-2.5 rounded-xl text-[14px] font-semibold tracking-wide ${active
+            ? 'bg-primary-600 text-white font-bold shadow-md shadow-primary-600/40 ring-1 ring-primary-500/50'
+            : 'text-purple-100 hover:bg-primary-600 hover:text-white hover:shadow-sm hover:shadow-primary-600/20'
+          }`
+          }`}
       >
         <div className="flex items-center gap-3 min-w-0">
           <MenuIcon
             icon={node.icon}
             name={node.nama}
             size={isSubmenu ? 15 : 19}
-            className={`${
-              active
-                ? 'text-white shrink-0 drop-shadow-xs'
-                : 'text-purple-200/80 shrink-0 group-hover:text-white'
-            }`}
+            className={`${active
+              ? 'text-white shrink-0 drop-shadow-xs'
+              : 'text-purple-200/80 shrink-0 group-hover:text-white'
+              }`}
           />
           <span className="truncate">{node.nama}</span>
         </div>
@@ -563,22 +457,20 @@ const ExpandedMenuNodeItem: React.FC<ExpandedMenuNodeItemProps> = ({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[14px] font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
-          open || isChildActive
-            ? 'bg-primary-900/40 text-white border-l-[3px] border-primary-500 shadow-xs'
-            : 'text-purple-100 hover:bg-primary-600 hover:text-white'
-        }`}
+        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[14px] font-semibold tracking-wide transition-all duration-200 cursor-pointer ${open || isChildActive
+          ? 'bg-primary-900/40 text-white border-l-[3px] border-primary-500 shadow-xs'
+          : 'text-purple-100 hover:bg-primary-600 hover:text-white'
+          }`}
       >
         <div className="flex items-center gap-3 min-w-0">
           <MenuIcon
             icon={node.icon}
             name={node.nama}
             size={19}
-            className={`${
-              isChildActive || open
-                ? 'text-primary-400 shrink-0'
-                : 'text-purple-200/80 shrink-0'
-            }`}
+            className={`${isChildActive || open
+              ? 'text-primary-400 shrink-0'
+              : 'text-purple-200/80 shrink-0'
+              }`}
           />
           <span className="truncate">{node.nama}</span>
         </div>

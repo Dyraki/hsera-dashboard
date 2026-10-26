@@ -21,7 +21,6 @@ const TargetListPage = lazy(() => import('../presentation/pages/Salesmanship/Tar
 const CallsheetFormPage = lazy(() => import('../presentation/pages/Salesmanship/Callsheet').then((module) => ({ default: module.CallsheetFormPage })));
 const MonitoringPage = lazy(() => import('../presentation/pages/Salesmanship/Monitoring').then((module) => ({ default: module.MonitoringPage })));
 const ReportWeeklyDistrictPage = lazy(() => import('../presentation/pages/Salesmanship/ReportWeeklyDistrict').then((module) => ({ default: module.ReportWeeklyDistrictPage })));
-const DesignSystemShowcasePage = lazy(() => import('../presentation/pages/DesignSystem/DesignSystemShowcasePage').then((module) => ({ default: module.DesignSystemShowcasePage })));
 
 const protectedElement = (menuId: string, minLevel: number, page: React.ReactNode) => (
   <ProtectedRoute menuId={menuId} minLevel={minLevel}>{page}</ProtectedRoute>
@@ -33,6 +32,7 @@ export const AppRoutes: React.FC = () => (
       <Route path={routePaths.login} element={<LoginPage />} />
       <Route path={routePaths.unauthorized} element={<UnauthorizedPage />} />
       <Route path={routePaths.dashboard} element={protectedElement(SYSTEM_MENU_IDS.DASHBOARD, 1, <DashboardPage />)} />
+      <Route path={routePaths.dashboardAlias} element={protectedElement(SYSTEM_MENU_IDS.DASHBOARD, 1, <DashboardPage />)} />
       <Route path={routePaths.menuList} element={protectedElement(SYSTEM_MENU_IDS.SETTINGS, 1, <MenuListPage />)} />
       <Route path={routePaths.menuCreate} element={protectedElement(SYSTEM_MENU_IDS.SETTINGS, 2, <MenuFormPage />)} />
       <Route path={routePaths.menuEdit} element={protectedElement(SYSTEM_MENU_IDS.SETTINGS, 3, <MenuFormPage />)} />
@@ -51,7 +51,6 @@ export const AppRoutes: React.FC = () => (
       <Route path={routePaths.salesmanshipReportWeeklyDistrict} element={protectedElement(SYSTEM_MENU_IDS.REPORT_WEEKLY_DISTRICT, 1, <ReportWeeklyDistrictPage />)} />
       <Route path={routePaths.comingSoon} element={<ComingSoonPage />} />
       <Route path={routePaths.comingSoonSystem} element={<ComingSoonPage />} />
-      {import.meta.env.DEV && <Route path={routePaths.designSystem} element={protectedElement(SYSTEM_MENU_IDS.DASHBOARD, 1, <DesignSystemShowcasePage />)} />}
       <Route path={routePaths.fallback} element={<ComingSoonPage />} />
     </Routes>
   </Suspense>

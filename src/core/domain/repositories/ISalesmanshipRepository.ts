@@ -44,4 +44,8 @@ export interface ISalesmanshipRepository {
   // Weekly District Report
   getWeeklyDistrictReport(filter: import('../models/ReportWeeklyDistrict').WeeklyDistrictReportFilterQuery): Promise<import('../models/ReportWeeklyDistrict').WeeklyDistrictReportResponse>;
   getAvailableWeeks(ouKode?: string): Promise<import('../models/ReportWeeklyDistrict').AvailableWeekOption[]>;
+
+  // Dashboard Overview
+  getDashboard(filter?: import('../models/Dashboard').DashboardFilterQuery): Promise<import('../models/Dashboard').DashboardDTO>;
 }
+

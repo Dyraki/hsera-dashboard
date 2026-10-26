@@ -4,6 +4,7 @@ export interface District {
   kode: string;
   karyawanId: string;
   karyawanName?: string;
+  karyawanNip?: string;
   channels?: Array<{ id: string; kode: string; nama: string }>;
   status: 'AKTIF' | 'NONAKTIF' | string;
   createdAt?: string;
@@ -21,6 +22,7 @@ export interface DistrictWriteData {
 export interface SalesmanOption {
   id: string;
   namaLengkap: string;
+  employeeNumber?: string;
   nik?: string;
   jabatan?: string;
   ouKode?: string;

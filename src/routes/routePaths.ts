@@ -2,6 +2,7 @@ export const routePaths = {
   login: '/login',
   unauthorized: '/unauthorized',
   dashboard: '/',
+  dashboardAlias: '/dashboard',
   menuList: '/settings/menu',
   menuCreate: '/settings/menu/new',
   menuEdit: '/settings/menu/edit/:id',
@@ -20,6 +21,5 @@ export const routePaths = {
   salesmanshipReportWeeklyDistrict: '/salesmanship/report/weekly-district',
   comingSoon: '/coming-soon',
   comingSoonSystem: '/system/coming-soon',
-  designSystem: '/design-system',
   fallback: '/*'
 } as const;

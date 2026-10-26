@@ -123,7 +123,9 @@ export const TerritoryTable: React.FC<TerritoryTableProps> = ({
                     <td className="py-3.5 px-4">
                       <div className="space-y-0.5">
                         <div className="font-medium text-gray-900">{d.karyawanName || d.karyawanId}</div>
-                        <div className="text-caption text-gray-600 font-mono">ID: {d.karyawanId}</div>
+                        <div className="text-caption text-gray-600 font-mono">
+                          {d.karyawanNip ? `NIP: ${d.karyawanNip}` : (d.karyawanId ? `ID: ${d.karyawanId}` : '-')}
+                        </div>
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
