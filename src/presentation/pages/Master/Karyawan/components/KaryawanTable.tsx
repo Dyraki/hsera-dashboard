@@ -1,9 +1,10 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, Eye, Mail, MapPin, Pencil, Phone, Trash2, Users } from 'lucide-react';
+import { Eye, Mail, MapPin, Pencil, Phone, Trash2, Users } from 'lucide-react';
 import { Karyawan } from '../../../../../core/domain/models/Karyawan';
 import { Badge } from '@/presentation/components/ui/Badge';
 import { Button } from '@/presentation/components/ui/Button';
 import { PermissionButton } from '@/presentation/components/ui/PermissionButton';
+import { Pagination } from '@/presentation/components/ui/Pagination';
 import { SYSTEM_MENU_IDS } from '@/core/constants/MenuConstants';
 
 interface KaryawanTableProps {
@@ -12,12 +13,14 @@ interface KaryawanTableProps {
   page: number;
   totalPages: number;
   totalCount: number;
+  pageSize?: number;
   getUnitTypeBadge: (type?: string) => React.ReactNode;
   onCreate: () => void;
   onOpenDetail: (employee: Karyawan) => void;
   onEdit: (employee: Karyawan) => void;
   onDelete: (employee: Karyawan) => void;
   onPageChange: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
 }
 
 export const KaryawanTable: React.FC<KaryawanTableProps> = ({
@@ -26,12 +29,14 @@ export const KaryawanTable: React.FC<KaryawanTableProps> = ({
   page,
   totalPages,
   totalCount,
+  pageSize = 10,
   getUnitTypeBadge,
   onCreate,
   onOpenDetail,
   onEdit,
   onDelete,
-  onPageChange
+  onPageChange,
+  onPageSizeChange
 }) => (
   <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
     <div className="overflow-x-auto">
@@ -103,12 +108,15 @@ export const KaryawanTable: React.FC<KaryawanTableProps> = ({
         </tbody>
       </table>
     </div>
-    {totalPages > 1 && <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50 text-body-sm text-gray-600">
-      <div>Menampilkan halaman <span className="text-gray-950 font-semibold">{page}</span> dari <span className="text-gray-950 font-semibold">{totalPages}</span> ({totalCount} total karyawan)</div>
-      <div className="flex items-center gap-1.5">
-        <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className="px-2.5 py-1 text-xs"><ChevronLeft size={14} className="mr-1" /> Sebelumnya</Button>
-        <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)} className="px-2.5 py-1 text-xs">Berikutnya <ChevronRight size={14} className="ml-1" /></Button>
-      </div>
-    </div>}
+    <Pagination
+      currentPage={page}
+      totalPages={totalPages}
+      totalItems={totalCount}
+      pageSize={pageSize}
+      pageSizeOptions={[10, 50, 100]}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
+      itemLabel="karyawan"
+    />
   </div>
 );

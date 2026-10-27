@@ -42,7 +42,26 @@ export const VolumeTrendChartSection: React.FC<VolumeTrendChartSectionProps> = R
 
   const points = weeks.map((w, idx) => getCoordinates(w.totalVolume, idx));
 
-  // Generate SVG path string
+  // Generate branch points & paths for multi-line rendering
+  const branchPaths = branches.map((b) => {
+    const bPoints = weeks.map((w, idx) => getCoordinates(w.volumes[b.ouKode] || 0, idx));
+    let path = '';
+    if (bPoints.length === 1) {
+      path = `M ${bPoints[0].x - 20} ${bPoints[0].y} L ${bPoints[0].x + 20} ${bPoints[0].y}`;
+    } else if (bPoints.length > 1) {
+      path = bPoints.reduce(
+        (acc, pt, idx) => (idx === 0 ? `M ${pt.x} ${pt.y}` : `${acc} L ${pt.x} ${pt.y}`),
+        ''
+      );
+    }
+    return {
+      branch: b,
+      points: bPoints,
+      path,
+    };
+  });
+
+  // Generate Total SVG path string
   let linePath = '';
   let areaPath = '';
   if (points.length === 1) {
@@ -87,6 +106,12 @@ export const VolumeTrendChartSection: React.FC<VolumeTrendChartSectionProps> = R
               <span>{b.namaCabang}</span>
             </div>
           ))}
+          {branches.length > 1 && (
+            <div className="flex items-center gap-1.5 font-medium text-slate-500">
+              <span className="w-3 border-t-2 border-indigo-400 border-dashed inline-block" />
+              <span>Total Konsolidasi</span>
+            </div>
+          )}
           <span className="text-[11px] text-slate-400 font-mono">(1 Karton = 800 Pack)</span>
           {onSelectWeek && (
             <span className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded flex items-center gap-1">
@@ -98,7 +123,7 @@ export const VolumeTrendChartSection: React.FC<VolumeTrendChartSectionProps> = R
       </div>
 
       {/* Main SVG Area Chart */}
-      <div className="relative mt-4 overflow-x-auto">
+      <div className="relative mt-4 overflow-x-auto pb-4">
         {loading ? (
           <div className="h-48 flex items-center justify-center text-xs text-slate-400">
             Memuat grafik tren...
@@ -108,14 +133,14 @@ export const VolumeTrendChartSection: React.FC<VolumeTrendChartSectionProps> = R
             Belum ada transaksi callsheet pada kuartal yang dipilih.
           </div>
         ) : (
-          <div className="min-w-[600px] relative">
+          <div className="min-w-[620px] relative pt-1 pb-4">
             <svg
               viewBox={`0 0 ${chartWidth} ${chartHeight}`}
               className="w-full h-48 overflow-visible"
             >
               <defs>
                 <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
                   <stop offset="100%" stopColor="#6366f1" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
@@ -148,60 +173,120 @@ export const VolumeTrendChartSection: React.FC<VolumeTrendChartSectionProps> = R
                 );
               })}
 
-              {/* Area Gradient */}
+              {/* Area Gradient (Total Area Volume) */}
               {areaPath && <path d={areaPath} fill="url(#trendGradient)" />}
 
-              {/* Trend Line */}
-              {linePath && (
+              {/* Total Volume dashed line if multi-branch */}
+              {linePath && branches.length > 1 && (
                 <path
                   d={linePath}
                   fill="none"
-                  stroke="#4f46e5"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  stroke="#818cf8"
+                  strokeWidth="1.8"
+                  strokeDasharray="4 4"
+                  opacity="0.85"
                 />
               )}
 
-              {/* Data Points */}
-              {points.map((pt, idx) => {
+              {/* Individual Branch Trend Lines */}
+              {branchPaths.map(({ branch, path }) =>
+                path ? (
+                  <path
+                    key={branch.ouKode}
+                    d={path}
+                    fill="none"
+                    stroke={branch.color}
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                ) : null
+              )}
+
+              {/* Data Points and Column Highlights */}
+              {weeks.map((weekData, idx) => {
+                const pt = points[idx];
                 const isHovered = hoveredIdx === idx;
-                const weekData = weeks[idx];
                 const isSelected =
                   selectedWeek !== undefined && selectedWeek > 0
                     ? weekData.kodeMinggu === selectedWeek
                     : selectedWeek === 0
                     ? false
                     : weekData.weekLabel.includes('Aktif');
+
                 return (
-                  <g
-                    key={idx}
-                    className="cursor-pointer group"
-                    onClick={() => onSelectWeek && onSelectWeek(weekData.kodeMinggu)}
-                  >
+                  <g key={idx}>
+                    {/* Selected Week Indicator Line */}
                     {isSelected && (
+                      <line
+                        x1={pt.x}
+                        y1={paddingY - 5}
+                        x2={pt.x}
+                        y2={chartHeight - paddingY}
+                        stroke="#10b981"
+                        strokeDasharray="3 3"
+                        strokeWidth="1.5"
+                        opacity="0.7"
+                      />
+                    )}
+
+                    {/* Branch Data Point Circles */}
+                    {branchPaths.map(({ branch, points: bPts }) => {
+                      const bPt = bPts[idx];
+                      if (!bPt) return null;
+                      return (
+                        <g key={branch.ouKode}>
+                          {isSelected && (
+                            <circle
+                              cx={bPt.x}
+                              cy={bPt.y}
+                              r="8"
+                              fill="none"
+                              stroke={branch.color}
+                              strokeWidth="2"
+                              opacity="0.4"
+                              className="animate-pulse"
+                            />
+                          )}
+                          <circle
+                            cx={bPt.x}
+                            cy={bPt.y}
+                            r={isSelected || isHovered ? '5' : '3.5'}
+                            fill={isSelected ? branch.color : '#ffffff'}
+                            stroke={branch.color}
+                            strokeWidth="2"
+                            className="transition-all"
+                          />
+                        </g>
+                      );
+                    })}
+
+                    {/* Total Dot if multi-branch */}
+                    {branches.length > 1 && (
                       <circle
                         cx={pt.x}
                         cy={pt.y}
-                        r="9"
-                        fill="none"
-                        stroke="#10b981"
-                        strokeWidth="2"
-                        opacity="0.5"
-                        className="animate-pulse"
+                        r={isHovered ? '4' : '2.5'}
+                        fill="#6366f1"
+                        stroke="#ffffff"
+                        strokeWidth="1"
+                        opacity="0.8"
                       />
                     )}
-                    <circle
-                      cx={pt.x}
-                      cy={pt.y}
-                      r={isSelected ? '6' : isHovered ? '6' : '4'}
-                      fill={isSelected ? '#10b981' : '#ffffff'}
-                      stroke={isSelected ? '#059669' : '#4f46e5'}
-                      strokeWidth="2.5"
-                      className="transition-all"
+
+                    {/* Full Column Hover & Click Trigger */}
+                    <rect
+                      x={pt.x - 24}
+                      y={0}
+                      width={48}
+                      height={chartHeight}
+                      fill="transparent"
+                      className="cursor-pointer"
                       onMouseEnter={() => setHoveredIdx(idx)}
                       onMouseLeave={() => setHoveredIdx(null)}
+                      onClick={() => onSelectWeek && onSelectWeek(weekData.kodeMinggu)}
                     />
+
                     {/* X Axis Label */}
                     <text
                       x={pt.x}
@@ -210,6 +295,7 @@ export const VolumeTrendChartSection: React.FC<VolumeTrendChartSectionProps> = R
                       fontSize="10"
                       fill={isSelected ? '#059669' : '#64748b'}
                       fontWeight={isSelected ? '700' : '500'}
+                      className="pointer-events-none select-none"
                     >
                       {weekData.weekLabel}
                     </text>
@@ -221,27 +307,58 @@ export const VolumeTrendChartSection: React.FC<VolumeTrendChartSectionProps> = R
             {/* Interactive Tooltip Card */}
             {hoveredIdx !== null && weeks[hoveredIdx] && points[hoveredIdx] && (
               <div
-                className="absolute bg-slate-900 text-white text-xs p-2.5 rounded shadow-lg pointer-events-none z-20 transition-all duration-150"
+                className="absolute bg-slate-900/95 backdrop-blur-xs text-white text-xs p-3 rounded-lg shadow-xl border border-slate-700/80 pointer-events-none z-30 transition-all duration-150 min-w-[210px] whitespace-nowrap"
                 style={{
                   left: `${(points[hoveredIdx].x / chartWidth) * 100}%`,
                   top: `${(points[hoveredIdx].y / chartHeight) * 100}%`,
-                  transform: points[hoveredIdx].y < 65 ? 'translate(-50%, 14px)' : 'translate(-50%, -115%)',
+                  transform: `translate(${
+                    hoveredIdx >= weeks.length - 2 ? '-92%' : hoveredIdx === 0 ? '-8%' : '-50%'
+                  }, ${points[hoveredIdx].y < 110 ? '16px' : '-115%'})`,
                 }}
               >
-                <div className="font-bold text-[11px] text-slate-300 border-b border-slate-700 pb-1 mb-1">
-                  Minggu {weeks[hoveredIdx].weekLabel}
+                <div className="font-bold text-[11px] text-slate-200 border-b border-slate-700/80 pb-1.5 mb-2 flex items-center justify-between">
+                  <span>Minggu {weeks[hoveredIdx].weekLabel}</span>
+                  {weeks[hoveredIdx].kodeMinggu === selectedWeek && (
+                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-normal">
+                      Terpilih
+                    </span>
+                  )}
                 </div>
-                <div className="flex items-center justify-between gap-4">
-                  <span className="text-slate-400">Total Volume:</span>
-                  <span className="font-bold text-emerald-400">
-                    {formatNumber(weeks[hoveredIdx].totalVolume)} Pack
-                  </span>
-                </div>
-                <div className="flex items-center justify-between gap-4 text-[10px] text-slate-400 mt-0.5">
-                  <span>Setara:</span>
-                  <span>
-                    {(weeks[hoveredIdx].totalVolume / 800).toFixed(2)} Karton
-                  </span>
+
+                {/* Per Branch Breakdown */}
+                {branches.length > 0 && (
+                  <div className="space-y-1 mb-2">
+                    {branches.map((b) => {
+                      const bVol = weeks[hoveredIdx].volumes[b.ouKode] || 0;
+                      return (
+                        <div key={b.ouKode} className="flex items-center justify-between gap-4 text-xs">
+                          <span className="flex items-center gap-1.5 text-slate-300">
+                            <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: b.color }} />
+                            {b.namaCabang}:
+                          </span>
+                          <span className="font-mono font-semibold" style={{ color: b.color }}>
+                            {formatNumber(bVol)} Pack
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Total Volume */}
+                <div className="border-t border-slate-700/80 pt-1.5 space-y-0.5">
+                  <div className="flex items-center justify-between gap-4 text-xs">
+                    <span className="text-slate-400">Total Volume:</span>
+                    <span className="font-bold font-mono text-emerald-400">
+                      {formatNumber(weeks[hoveredIdx].totalVolume)} Pack
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 text-[10px] text-slate-400">
+                    <span>Setara:</span>
+                    <span className="font-mono">
+                      {(weeks[hoveredIdx].totalVolume / 800).toFixed(2)} Karton
+                    </span>
+                  </div>
                 </div>
               </div>
             )}

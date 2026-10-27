@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = false, setSidebarO
           <button
             type="button"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 -ml-1 sm:ml-0 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            className="lg:hidden p-2 -ml-1 sm:ml-0 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             title={sidebarOpen ? "Perkecil / Tutup menu navigasi" : "Perluas / Buka menu navigasi"}
             aria-label="Toggle menu navigasi"
           >

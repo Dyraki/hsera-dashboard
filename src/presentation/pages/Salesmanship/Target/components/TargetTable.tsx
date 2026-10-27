@@ -2,6 +2,7 @@ import React from 'react';
 import { Target, JenisTarget } from '@/core/domain/models/Target';
 import { Badge } from '@/presentation/components/ui/Badge';
 import { PermissionButton } from '@/presentation/components/ui/PermissionButton';
+import { Pagination } from '@/presentation/components/ui/Pagination';
 import { SYSTEM_MENU_IDS } from '@/core/constants/MenuConstants';
 import { Target as TargetIcon, Pencil, Trash2, Globe, Calendar, MapPin, Building2 } from 'lucide-react';
 import { getHariLabel } from '../types';
@@ -9,6 +10,12 @@ import { getHariLabel } from '../types';
 interface TargetTableProps {
   targets: Target[];
   isLoading: boolean;
+  page?: number;
+  totalPages?: number;
+  totalItems?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
   onCreate: () => void;
   onEdit: (target: Target) => void;
   onDelete: (target: Target) => void;
@@ -17,6 +24,12 @@ interface TargetTableProps {
 export const TargetTable: React.FC<TargetTableProps> = ({
   targets,
   isLoading,
+  page = 1,
+  totalPages = 1,
+  totalItems,
+  pageSize = 10,
+  onPageChange,
+  onPageSizeChange,
   onCreate,
   onEdit,
   onDelete,
@@ -218,6 +231,19 @@ export const TargetTable: React.FC<TargetTableProps> = ({
           </tbody>
         </table>
       </div>
+
+      {totalItems !== undefined && onPageChange && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 50, 100]}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+          itemLabel="target"
+        />
+      )}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { District, OperationUnitOption } from '@/core/domain/models/District';
 import { Badge } from '@/presentation/components/ui/Badge';
 import { PermissionButton } from '@/presentation/components/ui/PermissionButton';
+import { Pagination } from '@/presentation/components/ui/Pagination';
 import { SYSTEM_MENU_IDS } from '@/core/constants/MenuConstants';
 import { MapPin, Pencil, Trash2 } from 'lucide-react';
 
@@ -9,6 +10,12 @@ interface TerritoryTableProps {
   districts: District[];
   operationUnits: OperationUnitOption[];
   isLoading: boolean;
+  page?: number;
+  totalPages?: number;
+  totalItems?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
   onCreate: () => void;
   onEdit: (district: District) => void;
   onDelete: (district: District) => void;
@@ -18,6 +25,12 @@ export const TerritoryTable: React.FC<TerritoryTableProps> = ({
   districts,
   operationUnits,
   isLoading,
+  page = 1,
+  totalPages = 1,
+  totalItems,
+  pageSize = 10,
+  onPageChange,
+  onPageSizeChange,
   onCreate,
   onEdit,
   onDelete,
@@ -183,6 +196,19 @@ export const TerritoryTable: React.FC<TerritoryTableProps> = ({
           </tbody>
         </table>
       </div>
+
+      {totalItems !== undefined && onPageChange && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 50, 100]}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+          itemLabel="teritori"
+        />
+      )}
     </div>
   );
 };

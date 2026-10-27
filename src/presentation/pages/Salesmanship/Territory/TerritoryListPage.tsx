@@ -12,6 +12,12 @@ import { MapPin, Plus, Search } from 'lucide-react';
 export const TerritoryListPage: React.FC = () => {
   const {
     districts,
+    page,
+    totalPages,
+    totalItems,
+    pageSize,
+    handlePageChange,
+    handlePageSizeChange,
     operationUnits,
     salesmen,
     channels,
@@ -119,6 +125,12 @@ export const TerritoryListPage: React.FC = () => {
           districts={districts}
           operationUnits={operationUnits}
           isLoading={isLoading}
+          page={page}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
           onCreate={openCreateModal}
           onEdit={openEditModal}
           onDelete={openDeleteModal}

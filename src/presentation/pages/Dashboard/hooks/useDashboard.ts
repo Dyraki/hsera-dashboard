@@ -125,7 +125,13 @@ export const useDashboard = (): UseDashboardReturn => {
     // Case C: Operation Unit / Cabang Tunggal (Level Cabang ke bawah)
     // Locked strictly to their own branch; cannot view All Cabang or other branches.
     const activeBranchCode = userUnit?.kode || unitCode || 'CAB-TAG';
-    const activeBranchName = userUnit?.nama || (activeBranchCode === 'CAB-TAG' ? 'Cabang Tulungagung' : `Cabang ${activeBranchCode}`);
+    const activeBranchName =
+      userUnit?.nama ||
+      (activeBranchCode === 'CAB-TAG'
+        ? 'Cabang Tulungagung'
+        : activeBranchCode === 'CAB-TGK'
+        ? 'Cabang Trenggalek'
+        : `Cabang ${activeBranchCode}`);
     const list: DashboardOuOption[] = [
       { kode: activeBranchCode, nama: `${activeBranchName} (${activeBranchCode})`, type: 'OPERATION_UNIT' },
     ];

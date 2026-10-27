@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { routePaths } from "@/routes/routePaths";
 import {
   WeeklyDistrictMonitoringRow,
-  
   WeeklyMonitoringResponse,
 } from "@/core/domain/models/Monitoring";
 import {
@@ -143,7 +143,7 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
   // Handler to navigate to callsheet form
   const handleCellClick = (districtId: string, date: string) => {
     if (!date) return;
-    navigate(`/salesmanship/callsheet?districtId=${districtId}&date=${date}`);
+    navigate(`${routePaths.salesmanshipCallsheet}?districtId=${districtId}&date=${date}`);
   };
 
   if (isLoading) {

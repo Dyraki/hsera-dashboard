@@ -11,7 +11,14 @@ import { Target, Plus, Search, Activity, Users, ShoppingBag } from 'lucide-react
 export const TargetListPage: React.FC = () => {
   const {
     targets,
+    allFilteredTargets,
     rawTargetsCount,
+    page,
+    totalPages,
+    totalItems,
+    pageSize,
+    handlePageChange,
+    handlePageSizeChange,
     districts,
     operationUnits,
     isSuperAdmin,
@@ -44,10 +51,11 @@ export const TargetListPage: React.FC = () => {
     handleDelete,
   } = useTarget();
 
-  // Summary counts
-  const countKunjungan = targets.filter((t) => t.jenisTarget === 'KUNJUNGAN').length;
-  const countBd = targets.filter((t) => t.jenisTarget === 'BD').length;
-  const countEc = targets.filter((t) => t.jenisTarget === 'EC').length;
+  // Summary counts across all filtered targets
+  const allTargetsList = allFilteredTargets || targets;
+  const countKunjungan = allTargetsList.filter((t) => t.jenisTarget === 'KUNJUNGAN').length;
+  const countBd = allTargetsList.filter((t) => t.jenisTarget === 'BD').length;
+  const countEc = allTargetsList.filter((t) => t.jenisTarget === 'EC').length;
 
   const filteredDistricts = filterOu !== 'all'
     ? districts.filter((d) => d.ouKode === filterOu)
@@ -72,7 +80,7 @@ export const TargetListPage: React.FC = () => {
                 Setup Target Salesmanship
               </h1>
               <p className="text-body-sm text-gray-500 mt-0.5">
-                Konfigurasi acuan target harian salesmen: Kunjungan Toko, Brand Distribution (BD), Effective Call (EC), dan Volume Penjualan.
+                Konfigurasi setup target harian salesmen: Kunjungan, Brand Distribution (BD), Effective Call (EC), dan Volume Penjualan.
               </p>
             </div>
           </div>
@@ -215,6 +223,12 @@ export const TargetListPage: React.FC = () => {
         <TargetTable
           targets={targets}
           isLoading={isLoading}
+          page={page}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
           onCreate={openCreateDrawer}
           onEdit={openEditDrawer}
           onDelete={openDeleteModal}

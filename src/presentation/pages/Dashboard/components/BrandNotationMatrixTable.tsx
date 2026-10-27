@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, AlertTriangle } from 'lucide-react';
+import { Tag } from 'lucide-react';
 import { DashboardBrandMatrixRow } from '@/core/domain/models/Dashboard';
 
 interface BrandNotationMatrixTableProps {
@@ -33,7 +33,7 @@ export const BrandNotationMatrixTable: React.FC<BrandNotationMatrixTableProps> =
         <div className="flex items-center gap-2">
           <Tag size={17} className="text-indigo-600" />
           <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-            Matriks Rekap Notasi 15 Brand HSERA {sessionWeekDisplay ? `(${sessionWeekDisplay})` : ''}
+            Matriks Rekap Notasi Per Brand {sessionWeekDisplay ? `(${sessionWeekDisplay})` : ''}
           </h2>
           <span className="text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded">
             Master Brand Aktif
@@ -42,13 +42,17 @@ export const BrandNotationMatrixTable: React.FC<BrandNotationMatrixTableProps> =
 
         {/* Legend Badges */}
         <div className="flex items-center gap-2 text-xs">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
-            OOS &gt; 8% (Kritis)
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+            Tinggi (&gt; 50%)
           </span>
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-            SL &lt; 60% (Rendah)
+            Sedang (25% - 50%)
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Rendah (&lt; 25%)
           </span>
         </div>
       </div>
@@ -68,7 +72,7 @@ export const BrandNotationMatrixTable: React.FC<BrandNotationMatrixTableProps> =
               <th className="py-2.5 px-2.5 text-right">SK %</th>
               <th className="py-2.5 px-2.5 text-right">SL %</th>
               <th className="py-2.5 px-2.5 text-right">SD %</th>
-              <th className="py-2.5 px-2.5 text-right bg-rose-50/40 text-rose-800">OOS %</th>
+              <th className="py-2.5 px-2.5 text-right">OOS %</th>
               <th className="py-2.5 px-2.5 text-right">SB %</th>
               <th className="py-2.5 px-2.5 text-right">TL %</th>
               <th className="py-2.5 px-3 text-right">BPJ %</th>
@@ -92,16 +96,7 @@ export const BrandNotationMatrixTable: React.FC<BrandNotationMatrixTableProps> =
                 <tr key={b.kodeBrand} className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-2 px-3 text-center text-slate-400 font-mono text-[11px]">{b.urutan}</td>
                   <td className="py-2 px-3 font-mono font-bold text-slate-800 text-[11px]">{b.kodeBrand}</td>
-                  <td className="py-2 px-4 font-semibold text-slate-900">
-                    <div className="flex items-center gap-1.5">
-                      <span>{b.namaBrand}</span>
-                      {b.isOosCritical && (
-                        <span title="OOS > 8% Kritis!" className="inline-flex">
-                          <AlertTriangle size={12} className="text-rose-500 shrink-0" />
-                        </span>
-                      )}
-                    </div>
-                  </td>
+                  <td className="py-2 px-4 font-semibold text-slate-900">{b.namaBrand}</td>
                   <td className="py-2 px-3 text-right font-mono font-bold text-slate-900 bg-slate-50/60">
                     {b.bdPercent}%
                   </td>
@@ -111,17 +106,9 @@ export const BrandNotationMatrixTable: React.FC<BrandNotationMatrixTableProps> =
                     {formatNumber(b.totalVolPack)}
                   </td>
                   <td className={`py-2 px-2.5 text-right font-mono ${getNotationColor(b.skPercent)}`}>{b.skPercent}%</td>
-                  <td className="py-2 px-2.5 text-right font-mono">
-                    <span className={b.isSlLow ? 'font-bold text-amber-600 bg-amber-50 px-1 rounded' : getNotationColor(b.slPercent)}>
-                      {b.slPercent}%
-                    </span>
-                  </td>
+                  <td className={`py-2 px-2.5 text-right font-mono ${getNotationColor(b.slPercent)}`}>{b.slPercent}%</td>
                   <td className={`py-2 px-2.5 text-right font-mono ${getNotationColor(b.sdPercent)}`}>{b.sdPercent}%</td>
-                  <td className="py-2 px-2.5 text-right font-mono">
-                    <span className={b.isOosCritical ? 'font-bold text-rose-600 bg-rose-50 px-1 rounded' : getNotationColor(b.oosPercent)}>
-                      {b.oosPercent}%
-                    </span>
-                  </td>
+                  <td className={`py-2 px-2.5 text-right font-mono ${getNotationColor(b.oosPercent)}`}>{b.oosPercent}%</td>
                   <td className={`py-2 px-2.5 text-right font-mono ${getNotationColor(b.sbPercent)}`}>{b.sbPercent}%</td>
                   <td className={`py-2 px-2.5 text-right font-mono ${getNotationColor(b.tlPercent)}`}>{b.tlPercent}%</td>
                   <td className={`py-2 px-3 text-right font-mono font-semibold ${getNotationColor(b.bpjPercent)}`}>{b.bpjPercent}%</td>

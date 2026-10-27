@@ -266,6 +266,15 @@ export const useTarget = () => {
     }
   };
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset page when any filter or search changes
+  useEffect(() => {
+    setPage(1);
+  }, [filterOu, filterJenis, filterDistrict, filterStatus, searchKeyword]);
+
   // Filtered targets by search keyword
   const filteredTargets = targets.filter((t) => {
     if (!searchKeyword.trim()) return true;
@@ -277,9 +286,36 @@ export const useTarget = () => {
     return matchJenis || matchKode || matchOu || matchNilai;
   });
 
+  const totalItems = filteredTargets.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+
+  const paginatedTargets = filteredTargets.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize
+  );
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(1);
+  };
+
   return {
-    targets: filteredTargets,
+    targets: paginatedTargets,
+    allFilteredTargets: filteredTargets,
     rawTargetsCount: targets.length,
+    page: safePage,
+    totalPages,
+    totalItems,
+    pageSize,
+    setPage,
+    setPageSize,
+    handlePageChange,
+    handlePageSizeChange,
     districts,
     operationUnits,
     isSuperAdmin,

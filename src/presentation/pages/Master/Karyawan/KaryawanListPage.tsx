@@ -29,6 +29,8 @@ export const KaryawanListPage: React.FC = () => {
     page,
     totalPages,
     totalCount,
+    pageSize,
+    handlePageSizeChange,
     isDrawerOpen,
     setIsDrawerOpen,
     isDetailOpen,
@@ -134,12 +136,14 @@ export const KaryawanListPage: React.FC = () => {
           page={page}
           totalPages={totalPages}
           totalCount={totalCount}
+          pageSize={pageSize}
           getUnitTypeBadge={getUnitTypeBadge}
           onCreate={openCreateModal}
           onOpenDetail={openDetailModal}
           onEdit={openEditModal}
           onDelete={handleDelete}
           onPageChange={fetchKaryawan}
+          onPageSizeChange={handlePageSizeChange}
         />
 
       </div>

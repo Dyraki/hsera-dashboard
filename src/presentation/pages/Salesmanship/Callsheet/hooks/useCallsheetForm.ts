@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { District } from "@/core/domain/models/District";
 import {
   CallsheetFormResponse,
@@ -10,7 +11,7 @@ import { salesmanshipRepository } from "@/core/di/container";
 import { useToast } from "@/presentation/context/ToastContext";
 import { RowValidationResult, ColumnTotals } from "../types";
 
-const getTodayDateString = (): string => {
+export const getTodayDateString = (): string => {
   const d = new Date();
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, "0");
@@ -18,12 +19,32 @@ const getTodayDateString = (): string => {
   return `${year}-${month}-${day}`;
 };
 
+export const isValidDateString = (val?: string | null): boolean => {
+  if (!val) return false;
+  return /^\d{4}-\d{2}-\d{2}$/.test(val) && !isNaN(Date.parse(val));
+};
+
+export const findMatchingDistrictId = (list: District[], searchKey: string): string | null => {
+  if (!searchKey) return null;
+  const trimmed = searchKey.trim();
+  const found = list.find(
+    (d) => d.id === trimmed || d.kode.toLowerCase() === trimmed.toLowerCase()
+  );
+  return found ? found.id : null;
+};
+
 export const useCallsheetForm = () => {
   const { showToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const queryDistrictParam = searchParams.get("districtId") || searchParams.get("district") || "";
+  const queryDateParam = searchParams.get("date") || "";
 
   const [districts, setDistricts] = useState<District[]>([]);
-  const [selectedDistrictId, setSelectedDistrictId] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<string>(getTodayDateString());
+  const [selectedDistrictId, setSelectedDistrictId] = useState<string>(() => queryDistrictParam);
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    return isValidDateString(queryDateParam) ? queryDateParam : getTodayDateString();
+  });
 
   const [formSkeleton, setFormSkeleton] = useState<CallsheetFormResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -42,6 +63,42 @@ export const useCallsheetForm = () => {
   const [rekapId, setRekapId] = useState<string | undefined>(undefined);
   const [matrix, setMatrix] = useState<Record<string, Record<string, number>>>({});
 
+  // Sync state with URL when user selects district or date
+  const handleSelectDistrict = useCallback((id: string) => {
+    setSelectedDistrictId(id);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("districtId", id);
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  const handleSelectDate = useCallback((date: string) => {
+    setSelectedDate(date);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("date", date);
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  // Synchronize when searchParams changes externally (e.g. browser back/forward or click from monitoring)
+  useEffect(() => {
+    const qDistrict = searchParams.get("districtId") || searchParams.get("district");
+    const qDate = searchParams.get("date");
+
+    if (qDate && isValidDateString(qDate) && qDate !== selectedDate) {
+      setSelectedDate(qDate);
+    }
+
+    if (qDistrict && districts.length > 0) {
+      const matchedId = findMatchingDistrictId(districts, qDistrict);
+      if (matchedId && matchedId !== selectedDistrictId) {
+        setSelectedDistrictId(matchedId);
+      }
+    }
+  }, [searchParams, districts, selectedDate, selectedDistrictId]);
+
   // Fetch districts on mount
   useEffect(() => {
     let isMounted = true;
@@ -50,7 +107,11 @@ export const useCallsheetForm = () => {
         const list = await salesmanshipRepository.getDistricts({ status: "AKTIF" });
         if (isMounted) {
           setDistricts(list);
-          if (list.length > 0 && !selectedDistrictId) {
+          const initialTarget = queryDistrictParam || selectedDistrictId;
+          const matchedId = findMatchingDistrictId(list, initialTarget);
+          if (matchedId) {
+            setSelectedDistrictId(matchedId);
+          } else if (list.length > 0) {
             setSelectedDistrictId(list[0].id);
           }
         }
@@ -64,7 +125,7 @@ export const useCallsheetForm = () => {
     return () => {
       isMounted = false;
     };
-  }, [showToast]);
+  }, [showToast, queryDistrictParam]);
 
   // Load Form Skeleton & existing rekap whenever selectedDistrictId or selectedDate changes
   const loadFormData = useCallback(async () => {
@@ -342,9 +403,9 @@ export const useCallsheetForm = () => {
   return {
     districts,
     selectedDistrictId,
-    setSelectedDistrictId,
+    setSelectedDistrictId: handleSelectDistrict,
     selectedDate,
-    setSelectedDate,
+    setSelectedDate: handleSelectDate,
     formSkeleton,
     isLoading,
     isSubmitting,

@@ -196,13 +196,50 @@ export const useTerritory = () => {
     }
   };
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset page when any filter or search changes
+  useEffect(() => {
+    setPage(1);
+  }, [filterOu, filterStatus, searchKeyword]);
+
+  const totalItems = districts.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+
+  const paginatedDistricts = districts.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize
+  );
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(1);
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     fetchDistricts();
   };
 
   return {
-    districts,
+    districts: paginatedDistricts,
+    allDistricts: districts,
+    rawDistrictsCount: districts.length,
+    page: safePage,
+    totalPages,
+    totalItems,
+    pageSize,
+    setPage,
+    setPageSize,
+    handlePageChange,
+    handlePageSizeChange,
     operationUnits,
     salesmen,
     channels,

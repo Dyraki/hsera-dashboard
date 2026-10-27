@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import { findMatchingDistrictId, isValidDateString } from "./hooks/useCallsheetForm";
+import { District } from "@/core/domain/models/District";
 
 describe("Callsheet Matrix Calculations", () => {
   it("should calculate BD as OOS + SK + SL + SD + SB", () => {
@@ -109,3 +111,50 @@ describe("Callsheet Matrix Calculations", () => {
     expect(diff > 0).toBe(true);
   });
 });
+
+describe("Callsheet URL Query Parameter Resolution", () => {
+  const dummyDistricts: District[] = [
+    {
+      id: "uuid-tgk-01",
+      kode: "CAB-TGK",
+      ouKode: "CAB-TGK",
+      karyawanId: "k-1",
+      status: "AKTIF",
+    },
+    {
+      id: "uuid-tag-01",
+      kode: "D-01",
+      ouKode: "CAB-TAG",
+      karyawanId: "k-2",
+      status: "AKTIF",
+    },
+  ];
+
+  it("should match district by exact UUID", () => {
+    const matched = findMatchingDistrictId(dummyDistricts, "uuid-tgk-01");
+    expect(matched).toBe("uuid-tgk-01");
+  });
+
+  it("should match district by code case-insensitively", () => {
+    const matched = findMatchingDistrictId(dummyDistricts, "cab-tgk");
+    expect(matched).toBe("uuid-tgk-01");
+
+    const matchedD01 = findMatchingDistrictId(dummyDistricts, "d-01");
+    expect(matchedD01).toBe("uuid-tag-01");
+  });
+
+  it("should return null when district is not found or key is empty", () => {
+    expect(findMatchingDistrictId(dummyDistricts, "non-existent")).toBeNull();
+    expect(findMatchingDistrictId(dummyDistricts, "")).toBeNull();
+  });
+
+  it("should validate date strings properly", () => {
+    expect(isValidDateString("2026-10-27")).toBe(true);
+    expect(isValidDateString("2026-02-28")).toBe(true);
+    expect(isValidDateString("invalid-date")).toBe(false);
+    expect(isValidDateString("27-10-2026")).toBe(false);
+    expect(isValidDateString("")).toBe(false);
+    expect(isValidDateString(null)).toBe(false);
+  });
+});
+

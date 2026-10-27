@@ -18,6 +18,7 @@ export const useKaryawanList = ({ onError }: KaryawanListOptions) => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchLookups = async () => {
     try {
@@ -32,12 +33,12 @@ export const useKaryawanList = ({ onError }: KaryawanListOptions) => {
     }
   };
 
-  const fetchKaryawan = async (currentPage = page) => {
+  const fetchKaryawan = async (currentPage = page, currentLimit = pageSize) => {
     setIsLoading(true);
     try {
       const result = await useCases.getKaryawanPage.execute({
         page: currentPage,
-        limit: 10,
+        limit: currentLimit,
         search: searchKeyword.trim() || undefined,
         operationUnitId: filterUnitId || undefined,
         status: filterStatus === 'all' ? undefined : filterStatus === 'active'
@@ -52,6 +53,11 @@ export const useKaryawanList = ({ onError }: KaryawanListOptions) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    fetchKaryawan(1, newSize);
   };
 
   useEffect(() => {
@@ -78,6 +84,9 @@ export const useKaryawanList = ({ onError }: KaryawanListOptions) => {
     page,
     totalPages,
     totalCount,
+    pageSize,
+    setPageSize,
+    handlePageSizeChange,
     fetchKaryawan,
     fetchLookups,
     handleSearchSubmit
