@@ -35,6 +35,7 @@ Folder [doc/](file:///Users/dyra/Documents/Docker/hsera/hsera-dashboard/doc) mem
 | **[SALESMANSHIP_MODULE.md](file:///Users/dyra/Documents/Docker/hsera/hsera-dashboard/doc/SALESMANSHIP_MODULE.md)** | Penjelasan mendalam fitur Salesmanship: Master District/Teritori, Master Target, Rekap Callsheet (RIS Matrix Brands x Notasi), Monitoring Mingguan, dan Sistem Kunci Minggu. |
 | **[DATABASE_SCHEMA.md](file:///Users/dyra/Documents/Docker/hsera/hsera-dashboard/doc/DATABASE_SCHEMA.md)** | Schema lengkap PostgreSQL untuk database `hsera` dan `hsera_salesmanship`, tabel, relasi foreign key, tipe data, dan indexing. |
 | **[DEVELOPMENT_GUIDE.md](file:///Users/dyra/Documents/Docker/hsera/hsera-dashboard/doc/DEVELOPMENT_GUIDE.md)** | Panduan praktis penambahan fitur baru, panduan perintah Docker/NPM, daftar jebakan umum (*gotchas*), dan panduan testing Vitest. |
+| **[MIGRATION_GUIDE.md](file:///Users/dyra/Documents/Docker/hsera/hsera-dashboard/doc/MIGRATION_GUIDE.md)** | **Panduan Migrasi Komputer Baru**: Runbook setup, clone 3 repositori Git, 4 file `.env` lengkap, import dump SQL database, dan verifikasi port. |
 | **[STRUKTUR_FOLDER.md](file:///Users/dyra/Documents/Docker/hsera/hsera-dashboard/doc/STRUKTUR_FOLDER.md)** | Struktur direktori mendetail dari source code frontend `hsera-dashboard/src`. |
 
 ---

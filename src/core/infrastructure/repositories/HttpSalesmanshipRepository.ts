@@ -153,6 +153,38 @@ export class HttpSalesmanshipRepository implements ISalesmanshipRepository {
     await SalesmanshipHttpClient.delete(`/api/salesmanship/callsheets/${id}`);
   }
 
+  async downloadCallsheetTemplate(params: { districtId?: string; date?: string }): Promise<Blob> {
+    const query = new URLSearchParams();
+    if (params.districtId) query.append('districtId', params.districtId);
+    if (params.date) query.append('date', params.date);
+
+    const res = await SalesmanshipHttpClient.get(
+      `/api/salesmanship/callsheets/template?${query.toString()}`,
+      { responseType: 'blob' }
+    );
+    return res.data;
+  }
+
+  async importCallsheetExcel(
+    file: File,
+    statusRekap: 'DRAFT' | 'FINAL' = 'FINAL'
+  ): Promise<{ success: boolean; message: string; data: any }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('statusRekap', statusRekap);
+
+    const res = await SalesmanshipHttpClient.post<{ success: boolean; message: string; data: any }>(
+      '/api/salesmanship/callsheets/import',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return res.data;
+  }
+
   async getWeeklyMonitoring(kodeMinggu?: number, ouKode?: string): Promise<WeeklyMonitoringResponse> {
     const params = new URLSearchParams();
     if (kodeMinggu) params.append("kodeMinggu", String(kodeMinggu));
@@ -218,6 +250,25 @@ export class HttpSalesmanshipRepository implements ISalesmanshipRepository {
       success: boolean;
       data: import('../../domain/models/Dashboard').DashboardDTO;
     }>(`/api/salesmanship/dashboard${queryStr}`);
+    return res.data.data;
+  }
+
+  async getSkuSalesReport(
+    filter?: import('../../domain/models/ReportSkuSales').SkuSalesFilterQuery
+  ): Promise<import('../../domain/models/ReportSkuSales').SkuSalesReportResponse> {
+    const params = new URLSearchParams();
+    if (filter?.year) params.append('year', String(filter.year));
+    if (filter?.quarter) params.append('quarter', String(filter.quarter));
+    if (filter?.cycleType) params.append('cycleType', filter.cycleType);
+    if (filter?.ouKode && filter.ouKode !== 'all') params.append('ouKode', filter.ouKode);
+    if (filter?.districtId) params.append('districtId', filter.districtId);
+    if (filter?.statusRekap) params.append('statusRekap', filter.statusRekap);
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+
+    const res = await SalesmanshipHttpClient.get<{
+      success: boolean;
+      data: import('../../domain/models/ReportSkuSales').SkuSalesReportResponse;
+    }>(`/api/salesmanship/reports/sku-sales${queryStr}`);
     return res.data.data;
   }
 }

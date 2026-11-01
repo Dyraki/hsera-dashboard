@@ -6,7 +6,8 @@ import { CallsheetKpiCards } from "./components/CallsheetKpiCards";
 import { CallsheetMatrixTable } from "./components/CallsheetMatrixTable";
 import { CallsheetActionFooter } from "./components/CallsheetActionFooter";
 import { useToast } from "@/presentation/context/ToastContext";
-import { ClipboardList, MessageSquare, Loader2, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { ClipboardList, MessageSquare, Loader2, AlertTriangle, CheckCircle2, FileSpreadsheet } from "lucide-react";
+import { CallsheetImportDrawer } from "./components/CallsheetImportDrawer";
 
 // WhatsApp SVG Icon
 const WhatsAppIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4 fill-current" }) => (
@@ -27,6 +28,7 @@ const formatDateDisplay = (dateStr: string): string => {
 export const CallsheetFormPage: React.FC = () => {
   const { showToast } = useToast();
   const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState<boolean>(false);
+  const [isImportDrawerOpen, setIsImportDrawerOpen] = useState<boolean>(false);
 
   const {
     districts,
@@ -184,8 +186,19 @@ Type Kunjungan : ${typeKunjungan}`;
             </p>
           </div>
 
-          {/* Right Action: Share WhatsApp */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Right Action: Import Excel & Share WhatsApp */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsImportDrawerOpen(true)}
+              disabled={isLoading}
+              className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 hover:text-gray-900 font-semibold text-xs rounded-xl shadow-2xs transition-all cursor-pointer"
+              title="Import data rekap callsheet dari file Excel (.xlsx)"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+              <span>Import Excel</span>
+            </button>
+
             <button
               type="button"
               onClick={handleShareWhatsAppClick}
@@ -198,6 +211,16 @@ Type Kunjungan : ${typeKunjungan}`;
             </button>
           </div>
         </div>
+
+        {/* Drawer Import Callsheet Excel */}
+        <CallsheetImportDrawer
+          isOpen={isImportDrawerOpen}
+          onClose={() => setIsImportDrawerOpen(false)}
+          selectedDistrictId={selectedDistrictId}
+          selectedDate={selectedDate}
+          districtCode={formSkeleton?.district?.kode}
+          onImportSuccess={refreshData}
+        />
 
         {/* Modal Konfirmasi Data Belum Disimpan */}
         {isUnsavedModalOpen && (

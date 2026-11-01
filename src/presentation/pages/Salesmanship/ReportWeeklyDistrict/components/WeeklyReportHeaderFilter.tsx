@@ -3,14 +3,12 @@ import { AvailableWeekOption } from '@/core/domain/models/ReportWeeklyDistrict';
 import { OperationUnitOption, District } from '@/core/domain/models/District';
 import {
   ReportFilterState,
-  BRAND_KATEGORI_OPTIONS,
   STATUS_DATA_OPTIONS,
 } from '../types';
 import {
   Calendar,
   Building2,
   MapPin,
-  Tag,
   Filter,
   FileSpreadsheet,
   Printer,
@@ -113,8 +111,8 @@ export const WeeklyReportHeaderFilter: React.FC<WeeklyReportHeaderFilterProps> =
         </div>
       </div>
 
-      {/* Filter Grid: Minggu, OU, District, Kategori Brand, Status Data */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 pt-1">
+      {/* Filter Grid: Minggu, OU, District, Status Data */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
         {/* 1. MINGGU ISO DROPDOWN */}
         <div className="space-y-1.5">
           <label className="flex items-center gap-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -187,27 +185,7 @@ export const WeeklyReportHeaderFilter: React.FC<WeeklyReportHeaderFilterProps> =
           </select>
         </div>
 
-        {/* 4. KATEGORI BRAND DROPDOWN */}
-        <div className="space-y-1.5">
-          <label className="flex items-center gap-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">
-            <Tag className="w-3.5 h-3.5 text-primary-600" />
-            <span>Kategori Brand</span>
-          </label>
-          <select
-            value={filters.kategori}
-            onChange={(e) => onFilterChange({ kategori: e.target.value })}
-            disabled={isLoading}
-            className="w-full text-xs font-medium bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer shadow-2xs"
-          >
-            {BRAND_KATEGORI_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* 5. STATUS DATA DROPDOWN */}
+        {/* 4. STATUS DATA DROPDOWN */}
         <div className="space-y-1.5">
           <label className="flex items-center gap-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">
             <Filter className="w-3.5 h-3.5 text-primary-600" />

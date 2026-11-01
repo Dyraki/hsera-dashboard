@@ -36,6 +36,8 @@ export interface ISalesmanshipRepository {
   getCallsheetFormData(districtId: string, date: string): Promise<CallsheetFormResponse>;
   saveCallsheet(payload: SaveCallsheetPayload): Promise<any>;
   deleteCallsheet(id: string): Promise<void>;
+  downloadCallsheetTemplate(params: { districtId?: string; date?: string }): Promise<Blob>;
+  importCallsheetExcel(file: File, statusRekap?: 'DRAFT' | 'FINAL'): Promise<{ success: boolean; message: string; data: any }>;
 
   // Weekly Monitoring & Lock Audit
   getWeeklyMonitoring(kodeMinggu?: number, ouKode?: string): Promise<WeeklyMonitoringResponse>;
@@ -47,5 +49,8 @@ export interface ISalesmanshipRepository {
 
   // Dashboard Overview
   getDashboard(filter?: import('../models/Dashboard').DashboardFilterQuery): Promise<import('../models/Dashboard').DashboardDTO>;
+
+  // SKU Sales Report
+  getSkuSalesReport(filter: import('../models/ReportSkuSales').SkuSalesFilterQuery): Promise<import('../models/ReportSkuSales').SkuSalesReportResponse>;
 }
 

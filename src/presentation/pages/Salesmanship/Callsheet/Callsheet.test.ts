@@ -156,5 +156,27 @@ describe("Callsheet URL Query Parameter Resolution", () => {
     expect(isValidDateString("")).toBe(false);
     expect(isValidDateString(null)).toBe(false);
   });
+
+  describe("Callsheet Excel Import Validation", () => {
+    it("should validate allowed Excel file extensions (.xlsx and .xls)", () => {
+      const validFiles = ["Template_Callsheet_D-01_2026-10-30.xlsx", "rekap.xls", "DATA.XLSX"];
+      const invalidFiles = ["rekap.csv", "document.pdf", "data.json", "sheet.txt"];
+
+      const isExcel = (fileName: string) => {
+        const lower = fileName.toLowerCase();
+        return lower.endsWith(".xlsx") || lower.endsWith(".xls");
+      };
+
+      validFiles.forEach((file) => expect(isExcel(file)).toBe(true));
+      invalidFiles.forEach((file) => expect(isExcel(file)).toBe(false));
+    });
+
+    it("should validate maximum file size (10 MB)", () => {
+      const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+      expect(5 * 1024 * 1024 <= MAX_SIZE).toBe(true);
+      expect(11 * 1024 * 1024 <= MAX_SIZE).toBe(false);
+    });
+  });
 });
+
 

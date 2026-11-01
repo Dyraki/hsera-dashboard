@@ -19,6 +19,7 @@ export const routePaths = {
   salesmanshipCallsheet: '/salesmanship/callsheet',
   salesmanshipMonitoring: '/salesmanship/monitoring',
   salesmanshipReportWeeklyDistrict: '/salesmanship/report/weekly-district',
+  salesmanshipReportSku: '/salesmanship/report/sku',
   comingSoon: '/coming-soon',
   comingSoonSystem: '/system/coming-soon',
   fallback: '/*'
