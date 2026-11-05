@@ -67,7 +67,7 @@ export const BrandFormDrawer: React.FC<BrandFormDrawerProps> = ({
           <input
             type="text"
             required
-            placeholder="Misal: GG_FILTER, GG_SURYA, PMI_MARLBORO"
+            placeholder="Misal: HSF12, HSB20, SANS12"
             value={values.kode}
             onChange={(e) => onChange('kode', e.target.value.toUpperCase().replace(/\s+/g, '_'))}
             className="w-full bg-white border border-gray-300 px-3.5 py-2.5 rounded-lg text-body-sm font-mono text-gray-900 placeholder:text-gray-400 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 outline-none uppercase"
@@ -85,7 +85,7 @@ export const BrandFormDrawer: React.FC<BrandFormDrawerProps> = ({
           <input
             type="text"
             required
-            placeholder="Misal: GG Filter International, GG Surya 16"
+            placeholder="Misal: HS Filter 12, HS Bold 20"
             value={values.nama}
             onChange={(e) => onChange('nama', e.target.value)}
             className="w-full bg-white border border-gray-300 px-3.5 py-2.5 rounded-lg text-body-sm text-gray-900 placeholder:text-gray-400 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 outline-none"

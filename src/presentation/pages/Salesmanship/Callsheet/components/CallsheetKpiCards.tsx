@@ -10,7 +10,9 @@ interface CallsheetKpiCardsProps {
   onChangeBdOutlet?: (val: number) => void;
   totalEc: number;
   onChangeTotalEc: (val: number) => void;
-  volumeGg: number | string;
+  totalVolume?: number | string;
+  volumeGg?: number | string;
+  onChangeTotalVolume?: (val: string) => void;
   onChangeVolumeGg?: (val: string) => void;
   disabled?: boolean;
 }
@@ -23,7 +25,8 @@ export const CallsheetKpiCards: React.FC<CallsheetKpiCardsProps> = ({
   onChangeBdOutlet,
   totalEc,
   onChangeTotalEc,
-  volumeGg,
+  totalVolume: propTotalVolume,
+  volumeGg: propVolumeGg,
   disabled = false,
 }) => {
   const [localBdOutlet, setLocalBdOutlet] = useState<number>(0);
@@ -37,9 +40,10 @@ export const CallsheetKpiCards: React.FC<CallsheetKpiCardsProps> = ({
     }
   };
 
+  const displayVolume = propTotalVolume !== undefined ? propTotalVolume : (propVolumeGg !== undefined ? propVolumeGg : "");
   const ecRate = jumlahKunjungan > 0 ? ((totalEc / jumlahKunjungan) * 100).toFixed(1) : "0.0";
   const bdRate = jumlahKunjungan > 0 ? ((bdOutlet / jumlahKunjungan) * 100).toFixed(1) : "0.0";
-  const numVolume = Number(volumeGg) || 0;
+  const numVolume = Number(displayVolume) || 0;
   const targetVolume = targets.volume ?? 140;
   const volumeRate = targetVolume > 0 ? ((numVolume / targetVolume) * 100).toFixed(1) : "0.0";
 
@@ -146,7 +150,7 @@ export const CallsheetKpiCards: React.FC<CallsheetKpiCardsProps> = ({
           </div>
         </div>
 
-        {/* Card 4: Volume Total GG (Auto-sum dari Total BUY) */}
+        {/* Card 4: Volume Total (Auto-sum dari Total BUY) */}
         <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs relative overflow-hidden group flex flex-col justify-between">
           <div className="flex items-center justify-between mb-2 min-h-[26px]">
             <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider flex items-center gap-1.5">
@@ -166,7 +170,7 @@ export const CallsheetKpiCards: React.FC<CallsheetKpiCardsProps> = ({
             <div className="w-28 sm:w-32 shrink-0">
               <input
                 type="text"
-                value={volumeGg}
+                value={displayVolume}
                 readOnly
                 disabled={disabled}
                 placeholder="0"

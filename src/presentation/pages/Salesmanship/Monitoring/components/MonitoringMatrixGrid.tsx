@@ -76,7 +76,7 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
             totals[idx].totalCm += day.jumlahKunjungan || 0;
             totals[idx].totalBd += day.bdOutlet || 0;
             totals[idx].totalEc += day.totalEc || 0;
-            totals[idx].totalVolume += Number(day.volumeGg) || 0;
+            totals[idx].totalVolume += Number(day.totalVolume ?? day.volumeGg) || 0;
           } else if (day.status === "TIDAK_ADA_KUNJUNGAN") {
             totals[idx].terisiCount++;
           }
@@ -248,7 +248,7 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
                                 FINAL
                               </span>
                               <span className="text-[10px] font-bold text-emerald-900">
-                                {Number(day.volumeGg || 0).toLocaleString("id-ID")} Pk
+                                {Number((day.totalVolume ?? day.volumeGg) || 0).toLocaleString("id-ID")} Pk
                               </span>
                             </div>
 
@@ -278,7 +278,7 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
                                 DRAFT
                               </span>
                               <span className="text-[10px] font-bold text-amber-900">
-                                {Number(day.volumeGg || 0).toLocaleString("id-ID")} Pk
+                                {Number((day.totalVolume ?? day.volumeGg) || 0).toLocaleString("id-ID")} Pk
                               </span>
                             </div>
 
@@ -346,7 +346,7 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
                               `• Kunjungan (CM): ${ach.actual.kunjungan} / ${ach.target.kunjungan} (${ach.percent.kunjungan}%)\n` +
                               `• Effective Call (EC): ${ach.actual.ec} / ${ach.target.ec} (${ach.percent.ec}%)\n` +
                               `• BD Outlet: ${ach.actual.bd} / ${ach.target.bd} (${ach.percent.bd}%)\n` +
-                              `• Volume GG: ${ach.actual.volume} / ${ach.target.volume || "-"} Pk (${ach.percent.volume}%)`
+                              `• Volume: ${ach.actual.volume} / ${ach.target.volume || "-"} Pk (${ach.percent.volume}%)`
                             : undefined
                         }
                       >
@@ -399,8 +399,8 @@ export const MonitoringMatrixGrid: React.FC<MonitoringMatrixGridProps> = ({
                           }`}
                           title={
                             ach.target.volume > 0
-                              ? `Volume GG: Realisasi ${ach.actual.volume} dari Target ${ach.target.volume} Pk (${ach.percent.volume}%)`
-                              : `Volume GG: Realisasi ${ach.actual.volume} Pk (Target belum diset)`
+                              ? `Volume: Realisasi ${ach.actual.volume} dari Target ${ach.target.volume} Pk (${ach.percent.volume}%)`
+                              : `Volume: Realisasi ${ach.actual.volume} Pk (Target belum diset)`
                           }
                         >
                           Vol:{" "}

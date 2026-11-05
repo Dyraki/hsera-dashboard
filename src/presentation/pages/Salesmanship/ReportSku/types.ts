@@ -22,7 +22,7 @@ export const QUARTER_OPTIONS: QuarterOptionItem[] = [
 ];
 
 export const CYCLE_OPTIONS = [
+  { value: 'ALL', label: 'Semua Minggu' },
   { value: 'EVEN', label: 'Week Genap' },
   { value: 'ODD', label: 'Week Ganjil' },
-  { value: 'ALL', label: 'Semua Week (13 Minggu)' },
 ] as const;

@@ -331,6 +331,7 @@ Type Kunjungan : ${typeKunjungan}`;
                   onChangeBdOutlet={setBdOutlet}
                   totalEc={totalEc}
                   onChangeTotalEc={setTotalEc}
+                  totalVolume={columnTotals.buy}
                   volumeGg={columnTotals.buy}
                   disabled={isFormDisabled}
                 />

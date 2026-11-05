@@ -1,8 +1,16 @@
+export interface UserRole {
+  id: string;
+  nama: string;
+  aktif?: number;
+}
+
 export interface User {
   id: string;
   username: string;
   jenis: string;
   idRelasi?: string | null;
+  roles?: UserRole[];
+  roleName?: string | null;
   karyawan?: {
     id: string;
     employeeNumber: string;

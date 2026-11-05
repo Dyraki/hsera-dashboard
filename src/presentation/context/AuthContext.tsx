@@ -29,6 +29,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       username: decoded.username,
       jenis: decoded.jenis,
       idRelasi: decoded.idRelasi,
+      roles: decoded.roles || [],
+      roleName: decoded.roleName || (decoded.roles && decoded.roles[0]?.nama) || null,
       karyawan: decoded.karyawan,
       scope: decoded.scope,
     });
@@ -78,6 +80,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           } else {
             applyUserToken(token);
+            if (!decoded.roles || decoded.roles.length === 0) {
+              AxiosHttpClient.get<{ user: any }>('/api/auth/profile')
+                .then((res) => {
+                  const prof = res.data?.user;
+                  if (prof?.roles || prof?.roleName) {
+                    setUser((prev) => prev ? {
+                      ...prev,
+                      roles: prof.roles || prev.roles,
+                      roleName: prof.roleName || prev.roleName,
+                    } : null);
+                  }
+                })
+                .catch(() => {});
+            }
           }
         } catch {
           await logout();

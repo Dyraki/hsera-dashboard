@@ -42,6 +42,7 @@ export interface CallsheetRekap {
   jumlahKunjungan: number;
   totalEc: number;
   bdOutlet?: number;
+  totalVolume?: number | null;
   volumeGg?: number | null;
   statusRekap: StatusRekap;
   catatan?: string | null;
@@ -72,6 +73,7 @@ export interface SaveCallsheetPayload {
   jumlahKunjungan?: number;
   totalEc?: number;
   bdOutlet?: number;
+  totalVolume?: number | null;
   volumeGg?: number | null;
   statusRekap?: StatusRekap;
   catatan?: string | null;

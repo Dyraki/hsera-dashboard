@@ -36,7 +36,8 @@ export interface CallsheetFormState {
   alasan: string;
   jumlahKunjungan: number;
   totalEc: number;
-  volumeGg: string;
+  totalVolume: string;
+  volumeGg?: string;
   catatan: string;
   statusRekap: StatusRekap;
   matrix: Record<string, Record<string, number>>; // [brandId][notasiKode] = number

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { User } from '@/core/domain/models/User';
 import {
   Bell,
   ChevronDown,
@@ -13,10 +14,51 @@ interface HeaderProps {
   setSidebarOpen?: (open: boolean) => void;
 }
 
+const formatRoleName = (role?: string | null): string => {
+  if (!role) return '';
+  return role
+    .split(/[\s_]+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
+export const getRoleManagementDisplay = (user: User | null): string => {
+  if (!user) return '';
+
+  // 1. Ambil dari nama role utama di user.roleName
+  if (user.roleName) {
+    return formatRoleName(user.roleName);
+  }
+
+  // 2. Ambil dari relasi daftar roles (login_grp)
+  if (user.roles && user.roles.length > 0) {
+    const activeRole = user.roles.find((r) => r.aktif === 1) || user.roles[0];
+    if (activeRole?.nama) {
+      return formatRoleName(activeRole.nama);
+    }
+  }
+
+  // 3. Fallback jika user adalah Super Admin
+  if (user.jenis === 'SA' || user.username === 'admin' || user.scope?.isSuperAdmin) {
+    return 'Super Admin';
+  }
+
+  // 4. Fallback hirarki teritori Operation Unit (unitType)
+  const unitType = user.scope?.unitType || user.karyawan?.unitType;
+  if (unitType === 'REGIONAL') return 'Regional Manager';
+  if (unitType === 'AREA_OFFICE') return 'Area Manager';
+  if (unitType === 'OPERATION_UNIT') return 'Supervisor';
+  if (unitType === 'HEAD_OFFICE') return 'Head Office';
+
+  // 5. Fallback jenis akun
+  if (user.jenis === 'pegawai') return 'Admin Staff';
+  return formatRoleName(user.jenis);
+};
+
 export const Header: React.FC<HeaderProps> = ({ sidebarOpen = false, setSidebarOpen }) => {
   const { user, logout } = useAuth();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-
+  const roleDisplay = getRoleManagementDisplay(user);
 
   return (
     <header className="h-16 shrink-0 bg-white border-b border-gray-200 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
@@ -66,8 +108,8 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = false, setSidebarO
               <span className="font-bold text-body-sm text-gray-900 block leading-tight">
                 {user?.karyawan?.legalName || user?.username}
               </span>
-              <span className="text-caption text-gray-400 font-semibold uppercase tracking-wider block">
-                {user?.jenis === 'pegawai' ? 'Admin' : user?.jenis}
+              <span className="text-caption text-gray-500 font-semibold tracking-wide block">
+                {roleDisplay}
               </span>
             </div>
 
@@ -82,15 +124,26 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = false, setSidebarO
 
           {profileDropdownOpen && (
             <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 z-50 animate-fadeIn">
-              {user?.karyawan && (
-                <div className="px-3 py-2.5 border-b border-gray-100 bg-gray-50/60 rounded-lg mb-1">
-                  <span className="font-semibold text-xs text-gray-900 block leading-tight">{user.karyawan.legalName}</span>
-                  <span className="text-[11px] text-gray-500 font-mono block mt-0.5">{user.karyawan.employeeNumber}</span>
-                  {user.karyawan.breadcrumb && (
-                    <span className="text-[10px] text-primary-600 block mt-1 leading-snug">{user.karyawan.breadcrumb}</span>
+              <div className="px-3 py-2.5 border-b border-gray-100 bg-gray-50/60 rounded-lg mb-1">
+                <span className="font-semibold text-xs text-gray-900 block leading-tight">
+                  {user?.karyawan?.legalName || user?.username}
+                </span>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-primary-50 text-primary-700 border border-primary-200">
+                    {roleDisplay}
+                  </span>
+                  {user?.karyawan?.employeeNumber && (
+                    <span className="text-[11px] text-gray-500 font-mono">
+                      {user.karyawan.employeeNumber}
+                    </span>
                   )}
                 </div>
-              )}
+                {user?.karyawan?.breadcrumb && (
+                  <span className="text-[10px] text-primary-600 block mt-1 leading-snug">
+                    {user.karyawan.breadcrumb}
+                  </span>
+                )}
+              </div>
               <button
                 onClick={logout}
                 className="flex w-full items-center gap-2.5 px-3 py-2 rounded-md text-body-sm font-semibold text-error-600 hover:bg-error-50 transition-colors"

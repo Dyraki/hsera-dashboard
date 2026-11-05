@@ -190,7 +190,7 @@ export const useWeeklyMonitoring = () => {
           totalCm += d.jumlahKunjungan || 0;
           totalBd += d.bdOutlet || 0;
           totalEc += d.totalEc || 0;
-          totalVolume += Number(d.volumeGg) || 0;
+          totalVolume += Number(d.totalVolume ?? d.volumeGg) || 0;
         } else if (d.status === "TIDAK_ADA_KUNJUNGAN") {
           totalHariFinal++; // counted as complete/excused
         } else {

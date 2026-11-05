@@ -57,7 +57,9 @@ export const useCallsheetForm = () => {
   const [jumlahKunjungan, setJumlahKunjungan] = useState<number>(0);
   const [totalEc, setTotalEc] = useState<number>(0);
   const [bdOutlet, setBdOutlet] = useState<number>(0);
-  const [volumeGg, setVolumeGg] = useState<string>("");
+  const [totalVolume, setTotalVolume] = useState<string>("");
+  const volumeGg = totalVolume;
+  const setVolumeGg = setTotalVolume;
   const [catatan, setCatatan] = useState<string>("");
   const [statusRekap, setStatusRekap] = useState<StatusRekap>("DRAFT");
   const [rekapId, setRekapId] = useState<string | undefined>(undefined);
@@ -146,7 +148,8 @@ export const useCallsheetForm = () => {
       setJumlahKunjungan(initialKunjungan);
       setTotalEc(r?.totalEc || 0);
       setBdOutlet(r?.bdOutlet || 0);
-      setVolumeGg(r?.volumeGg != null ? String(r.volumeGg) : "");
+      const volVal = r?.totalVolume ?? r?.volumeGg;
+      setTotalVolume(volVal != null ? String(volVal) : "");
       setCatatan(r?.catatan || "");
       setStatusRekap(r?.statusRekap || "DRAFT");
 
@@ -358,6 +361,7 @@ export const useCallsheetForm = () => {
         jumlahKunjungan: jenisRekap === "NORMAL" ? Number(jumlahKunjungan) || 0 : 0,
         totalEc: jenisRekap === "NORMAL" ? Number(totalEc) || 0 : 0,
         bdOutlet: jenisRekap === "NORMAL" ? Number(bdOutlet) || 0 : 0,
+        totalVolume: jenisRekap === "NORMAL" ? Number(columnTotals.buy) : null,
         volumeGg: jenisRekap === "NORMAL" ? Number(columnTotals.buy) : null,
         statusRekap: targetStatus,
         catatan: catatan || undefined,
@@ -421,6 +425,8 @@ export const useCallsheetForm = () => {
     setTotalEc,
     bdOutlet,
     setBdOutlet,
+    totalVolume,
+    setTotalVolume,
     volumeGg,
     setVolumeGg,
     catatan,

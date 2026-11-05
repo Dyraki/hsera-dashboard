@@ -29,7 +29,7 @@ export const useSkuSalesReport = () => {
   const [filters, setFilters] = useState<SkuReportFilterState>({
     year: 2026,
     quarter: 4,
-    cycleType: 'EVEN',
+    cycleType: 'ALL',
     ouKode: 'all',
     districtId: '',
   });

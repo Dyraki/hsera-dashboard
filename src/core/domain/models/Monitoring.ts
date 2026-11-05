@@ -11,7 +11,8 @@ export interface WeeklyMonitoringDayCell {
   jumlahKunjungan: number; // Callmade (CM)
   totalEc: number; // Effective Call (EC)
   bdOutlet: number; // Brand Distribution Outlet (BD)
-  volumeGg?: number | null; // Volume Pack
+  totalVolume?: number | null; // Volume Pack
+  volumeGg?: number | null; // Backward compatibility
   alasan?: string | null; // Alasan jika TIDAK_ADA_KUNJUNGAN
 }
 

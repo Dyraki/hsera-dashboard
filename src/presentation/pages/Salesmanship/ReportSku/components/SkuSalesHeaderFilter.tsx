@@ -56,7 +56,7 @@ export const SkuSalesHeaderFilter: React.FC<SkuSalesHeaderFilterProps> = ({
                 Laporan Penjualan SKU (Per Kuartal)
               </h1>
               <span className="text-[11px] font-semibold bg-primary-50 text-primary-700 border border-primary-200 px-2 py-0.5 rounded-full">
-                Siklus {filters.cycleType === 'EVEN' ? 'Week Genap' : filters.cycleType === 'ODD' ? 'Week Ganjil' : 'Semua Week'}
+                Siklus {filters.cycleType === 'EVEN' ? 'Week Genap' : filters.cycleType === 'ODD' ? 'Week Ganjil' : 'Semua Minggu'}
               </span>
             </div>
             <p className="text-xs text-gray-500 mt-0.5">

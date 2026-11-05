@@ -20,6 +20,7 @@ export const routePaths = {
   salesmanshipMonitoring: '/salesmanship/monitoring',
   salesmanshipReportWeeklyDistrict: '/salesmanship/report/weekly-district',
   salesmanshipReportSku: '/salesmanship/report/sku',
+  salesmanshipReportKpi: '/salesmanship/report/kpi',
   comingSoon: '/coming-soon',
   comingSoonSystem: '/system/coming-soon',
   fallback: '/*'

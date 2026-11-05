@@ -271,5 +271,27 @@ export class HttpSalesmanshipRepository implements ISalesmanshipRepository {
     }>(`/api/salesmanship/reports/sku-sales${queryStr}`);
     return res.data.data;
   }
+
+  async getKpiReport(
+    filter?: import('../../domain/models/ReportKpi').KpiReportFilterQuery
+  ): Promise<import('../../domain/models/ReportKpi').KpiTrackingReportResponse> {
+    const params = new URLSearchParams();
+    if (filter?.year) params.append('year', String(filter.year));
+    if (filter?.quarter) params.append('quarter', String(filter.quarter));
+    if (filter?.cycleType) params.append('cycleType', filter.cycleType);
+    if (filter?.selectedWeek !== undefined && filter?.selectedWeek !== null) {
+      params.append('selectedWeek', String(filter.selectedWeek));
+    }
+    if (filter?.ouKode && filter.ouKode !== 'all') params.append('ouKode', filter.ouKode);
+    if (filter?.districtId && filter.districtId !== 'all') params.append('districtId', filter.districtId);
+    if (filter?.statusRekap) params.append('statusRekap', filter.statusRekap);
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+
+    const res = await SalesmanshipHttpClient.get<{
+      success: boolean;
+      data: import('../../domain/models/ReportKpi').KpiTrackingReportResponse;
+    }>(`/api/salesmanship/reports/kpi-tracking${queryStr}`);
+    return res.data.data;
+  }
 }
 

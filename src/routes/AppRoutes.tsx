@@ -22,6 +22,7 @@ const CallsheetFormPage = lazy(() => import('../presentation/pages/Salesmanship/
 const MonitoringPage = lazy(() => import('../presentation/pages/Salesmanship/Monitoring').then((module) => ({ default: module.MonitoringPage })));
 const ReportWeeklyDistrictPage = lazy(() => import('../presentation/pages/Salesmanship/ReportWeeklyDistrict').then((module) => ({ default: module.ReportWeeklyDistrictPage })));
 const ReportSkuPage = lazy(() => import('../presentation/pages/Salesmanship/ReportSku').then((module) => ({ default: module.ReportSkuPage })));
+const ReportKpiPage = lazy(() => import('../presentation/pages/Salesmanship/ReportKpi').then((module) => ({ default: module.ReportKpiPage })));
 
 const protectedElement = (menuId: string, minLevel: number, page: React.ReactNode) => (
   <ProtectedRoute menuId={menuId} minLevel={minLevel}>{page}</ProtectedRoute>
@@ -51,6 +52,7 @@ export const AppRoutes: React.FC = () => (
       <Route path={routePaths.salesmanshipMonitoring} element={protectedElement(SYSTEM_MENU_IDS.MONITORING_CALLSHEET, 1, <MonitoringPage />)} />
       <Route path={routePaths.salesmanshipReportWeeklyDistrict} element={protectedElement(SYSTEM_MENU_IDS.REPORT_WEEKLY_DISTRICT, 1, <ReportWeeklyDistrictPage />)} />
       <Route path={routePaths.salesmanshipReportSku} element={protectedElement(SYSTEM_MENU_IDS.REPORT_SKU, 1, <ReportSkuPage />)} />
+      <Route path={routePaths.salesmanshipReportKpi} element={protectedElement(SYSTEM_MENU_IDS.REPORT_WEEKLY_DISTRICT, 1, <ReportKpiPage />)} />
       <Route path={routePaths.comingSoon} element={<ComingSoonPage />} />
       <Route path={routePaths.comingSoonSystem} element={<ComingSoonPage />} />
       <Route path={routePaths.fallback} element={<ComingSoonPage />} />

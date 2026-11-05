@@ -52,5 +52,8 @@ export interface ISalesmanshipRepository {
 
   // SKU Sales Report
   getSkuSalesReport(filter: import('../models/ReportSkuSales').SkuSalesFilterQuery): Promise<import('../models/ReportSkuSales').SkuSalesReportResponse>;
+
+  // KPI Tracking Report
+  getKpiReport(filter: import('../models/ReportKpi').KpiReportFilterQuery): Promise<import('../models/ReportKpi').KpiTrackingReportResponse>;
 }
 
