@@ -147,7 +147,7 @@ export const SkuSalesMatrixTable: React.FC<SkuSalesMatrixTableProps> = ({
                 className="py-3 px-3 w-32 text-right cursor-pointer select-none group bg-amber-50/50 hover:bg-amber-100/60 transition-colors text-amber-950"
               >
                 <div className="flex items-center justify-end gap-1">
-                  <span>Growth (vs W{prevCycleWeekNumber})</span>
+                  <span>WoW (vs W{prevCycleWeekNumber})</span>
                   {renderSortIcon('growthWtdPercent')}
                 </div>
               </th>

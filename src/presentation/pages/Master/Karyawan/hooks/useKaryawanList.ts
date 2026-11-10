@@ -5,13 +5,15 @@ import { OperationUnitOption } from '../types';
 
 interface KaryawanListOptions {
   onError: (message: string) => void;
+  onSuccess?: (message: string) => void;
 }
 
-export const useKaryawanList = ({ onError }: KaryawanListOptions) => {
+export const useKaryawanList = ({ onError, onSuccess }: KaryawanListOptions) => {
   const [karyawans, setKaryawans] = useState<Karyawan[]>([]);
   const [availableUnits, setAvailableUnits] = useState<OperationUnitOption[]>([]);
   const [allSupervisors, setAllSupervisors] = useState<KaryawanSupervisor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [filterUnitId, setFilterUnitId] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -70,11 +72,48 @@ export const useKaryawanList = ({ onError }: KaryawanListOptions) => {
     fetchKaryawan(1);
   };
 
+  const handleExportExcel = async () => {
+    setIsExporting(true);
+    try {
+      const exportLimit = Math.max(1000, totalCount || 1000);
+      const result = await useCases.getKaryawanPage.execute({
+        page: 1,
+        limit: exportLimit,
+        search: searchKeyword.trim() || undefined,
+        operationUnitId: filterUnitId || undefined,
+        status: filterStatus === 'all' ? undefined : filterStatus === 'active',
+      });
+
+      if (!result.data || result.data.length === 0) {
+        onError('Tidak ada data karyawan yang cocok untuk diekspor.');
+        return;
+      }
+
+      const activeUnit = availableUnits.find((u) => u.id === filterUnitId);
+      const { exportKaryawanToExcel } = await import('../utils/exportKaryawanExcel');
+      await exportKaryawanToExcel(result.data, {
+        unitName: activeUnit ? `[${activeUnit.code}] ${activeUnit.name}` : undefined,
+        searchKeyword: searchKeyword.trim() || undefined,
+        statusLabel: filterStatus === 'active' ? 'Aktif' : filterStatus === 'inactive' ? 'Nonaktif' : 'Semua',
+      });
+
+      if (onSuccess) {
+        onSuccess(`Berhasil mengekspor ${result.data.length} data karyawan ke Excel.`);
+      }
+    } catch (error: unknown) {
+      console.error('Error exporting karyawan:', error);
+      onError(error instanceof Error ? error.message : 'Gagal mengekspor data karyawan.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return {
     karyawans,
     availableUnits,
     allSupervisors,
     isLoading,
+    isExporting,
     searchKeyword,
     setSearchKeyword,
     filterUnitId,
@@ -89,6 +128,7 @@ export const useKaryawanList = ({ onError }: KaryawanListOptions) => {
     handlePageSizeChange,
     fetchKaryawan,
     fetchLookups,
-    handleSearchSubmit
+    handleSearchSubmit,
+    handleExportExcel
   };
 };

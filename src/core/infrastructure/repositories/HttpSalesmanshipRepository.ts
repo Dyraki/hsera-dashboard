@@ -293,5 +293,28 @@ export class HttpSalesmanshipRepository implements ISalesmanshipRepository {
     }>(`/api/salesmanship/reports/kpi-tracking${queryStr}`);
     return res.data.data;
   }
+
+  async getNotationReport(
+    filter?: import('../../domain/models/ReportNotation').NotationReportFilterQuery
+  ): Promise<import('../../domain/models/ReportNotation').NotationReportResponse> {
+    const params = new URLSearchParams();
+    if (filter?.year) params.append('year', String(filter.year));
+    if (filter?.quarter) params.append('quarter', String(filter.quarter));
+    if (filter?.cycleType) params.append('cycleType', filter.cycleType);
+    if (filter?.selectedWeek !== undefined && filter?.selectedWeek !== null) {
+      params.append('selectedWeek', String(filter.selectedWeek));
+    }
+    if (filter?.ouKode && filter.ouKode !== 'all') params.append('ouKode', filter.ouKode);
+    if (filter?.districtId && filter.districtId !== 'all') params.append('districtId', filter.districtId);
+    if (filter?.brandId && filter.brandId !== 'all') params.append('brandId', filter.brandId);
+    if (filter?.statusRekap) params.append('statusRekap', filter.statusRekap);
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+
+    const res = await SalesmanshipHttpClient.get<{
+      success: boolean;
+      data: import('../../domain/models/ReportNotation').NotationReportResponse;
+    }>(`/api/salesmanship/reports/notation${queryStr}`);
+    return res.data.data;
+  }
 }
 

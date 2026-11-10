@@ -7,7 +7,10 @@ type NotificationType = 'success' | 'error';
 export const useKaryawan = () => {
   const { showToast } = useToast();
   const notify = (type: NotificationType, message: string) => showToast(type, message);
-  const list = useKaryawanList({ onError: (message) => notify('error', message) });
+  const list = useKaryawanList({
+    onError: (message) => notify('error', message),
+    onSuccess: (message) => notify('success', message),
+  });
   const form = useKaryawanForm({
     availableUnitId: list.availableUnits[0]?.id,
     totalCount: list.totalCount,

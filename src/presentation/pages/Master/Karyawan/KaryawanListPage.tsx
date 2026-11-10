@@ -9,6 +9,7 @@ import {
   Users,
   UserPlus,
   Search,
+  Download,
 } from 'lucide-react';
 import { KaryawanTable } from './components/KaryawanTable';
 import { KaryawanFormDrawer } from './components/KaryawanFormDrawer';
@@ -20,6 +21,7 @@ export const KaryawanListPage: React.FC = () => {
     availableUnits,
     allSupervisors,
     isLoading,
+    isExporting,
     searchKeyword,
     setSearchKeyword,
     filterUnitId,
@@ -48,7 +50,8 @@ export const KaryawanListPage: React.FC = () => {
     handleSubmit,
     handleDelete,
     handleSearchSubmit,
-    fetchKaryawan
+    fetchKaryawan,
+    handleExportExcel
   } = useKaryawan();
   const getUnitTypeBadge = (type?: string) => {
     switch (type) {
@@ -75,9 +78,23 @@ export const KaryawanListPage: React.FC = () => {
             </p>
           </div>
 
-          <PermissionButton menuId={SYSTEM_MENU_IDS.KARYAWAN} minLevel={2} variant="primary" onClick={openCreateModal}>
-            <UserPlus size={16} className="mr-1.5" /> Tambah Karyawan
-          </PermissionButton>
+          <div className="flex items-center gap-2.5">
+            <PermissionButton
+              menuId={SYSTEM_MENU_IDS.KARYAWAN}
+              minLevel={2}
+              variant="secondary"
+              onClick={handleExportExcel}
+              disabled={isExporting}
+              title="Ekspor seluruh data karyawan yang difilter ke format Excel"
+            >
+              <Download size={16} className={`mr-1.5 text-emerald-600 ${isExporting ? 'animate-bounce' : ''}`} />
+              {isExporting ? 'Mengekspor...' : 'Ekspor Excel'}
+            </PermissionButton>
+
+            <PermissionButton menuId={SYSTEM_MENU_IDS.KARYAWAN} minLevel={2} variant="primary" onClick={openCreateModal}>
+              <UserPlus size={16} className="mr-1.5" /> Tambah Karyawan
+            </PermissionButton>
+          </div>
         </div>
 
         {/* Filter and Search Bar */}

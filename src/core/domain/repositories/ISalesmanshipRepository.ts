@@ -55,5 +55,8 @@ export interface ISalesmanshipRepository {
 
   // KPI Tracking Report
   getKpiReport(filter: import('../models/ReportKpi').KpiReportFilterQuery): Promise<import('../models/ReportKpi').KpiTrackingReportResponse>;
+
+  // Notation Analysis Report
+  getNotationReport(filter: import('../models/ReportNotation').NotationReportFilterQuery): Promise<import('../models/ReportNotation').NotationReportResponse>;
 }
 

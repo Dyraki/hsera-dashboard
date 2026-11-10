@@ -21,6 +21,7 @@ export const SYSTEM_MENU_IDS = {
   REPORT_WEEKLY_DISTRICT: '5db9ab11-5554-40bf-8d10-8aa71ca9ede9',
   REPORT_SKU: '70375d06-53ca-4ce8-bf5f-bf42b2caeaa1',
   REPORT_KPI: '70375d06-53ca-4ce8-bf5f-bf42b2caeaa2',
+  REPORT_NOTASI: '2e6467a7-0b4b-4567-9031-0a099f28c155',
 } as const;
 
 export type SystemMenuId = typeof SYSTEM_MENU_IDS[keyof typeof SYSTEM_MENU_IDS];

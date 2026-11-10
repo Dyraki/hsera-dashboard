@@ -21,6 +21,7 @@ export const routePaths = {
   salesmanshipReportWeeklyDistrict: '/salesmanship/report/weekly-district',
   salesmanshipReportSku: '/salesmanship/report/sku',
   salesmanshipReportKpi: '/salesmanship/report/kpi',
+  salesmanshipReportNotasi: '/salesmanship/report/notasi',
   comingSoon: '/coming-soon',
   comingSoonSystem: '/system/coming-soon',
   fallback: '/*'
