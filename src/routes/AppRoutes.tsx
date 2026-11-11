@@ -13,6 +13,8 @@ const MenuFormPage = lazy(() => import('../presentation/pages/Settings/Menu/Menu
 const RoleListPage = lazy(() => import('../presentation/pages/Settings/Role/RoleListPage').then((module) => ({ default: module.RoleListPage })));
 const RoleFormPage = lazy(() => import('../presentation/pages/Settings/Role/RoleFormPage').then((module) => ({ default: module.RoleFormPage })));
 const RoleUserPage = lazy(() => import('../presentation/pages/Settings/RoleUser/RoleUserPage').then((module) => ({ default: module.RoleUserPage })));
+const ProfilePage = lazy(() => import('../presentation/pages/Settings/Profile/ProfilePage').then((module) => ({ default: module.ProfilePage })));
+const SecurityPage = lazy(() => import('../presentation/pages/Settings/Security/SecurityPage').then((module) => ({ default: module.SecurityPage })));
 const OperationUnitListPage = lazy(() => import('../presentation/pages/Master/OperationUnit/OperationUnitListPage').then((module) => ({ default: module.OperationUnitListPage })));
 const KaryawanListPage = lazy(() => import('../presentation/pages/Master/Karyawan/KaryawanListPage').then((module) => ({ default: module.KaryawanListPage })));
 const BrandListPage = lazy(() => import('../presentation/pages/Master/Brand').then((module) => ({ default: module.BrandListPage })));
@@ -44,6 +46,8 @@ export const AppRoutes: React.FC = () => (
       <Route path={routePaths.roleEdit} element={protectedElement(SYSTEM_MENU_IDS.ROLE_MANAGEMENT, 3, <RoleFormPage />)} />
       <Route path={routePaths.roleUsers} element={protectedElement(SYSTEM_MENU_IDS.ROLE_USER, 1, <RoleUserPage />)} />
       <Route path={routePaths.roleUsersAlias} element={protectedElement(SYSTEM_MENU_IDS.ROLE_USER, 1, <RoleUserPage />)} />
+      <Route path={routePaths.profile} element={protectedElement(SYSTEM_MENU_IDS.PROFILE, 1, <ProfilePage />)} />
+      <Route path={routePaths.security} element={protectedElement(SYSTEM_MENU_IDS.SECURITY, 1, <SecurityPage />)} />
       <Route path={routePaths.operationUnits} element={protectedElement(SYSTEM_MENU_IDS.OPERATION_UNIT, 1, <OperationUnitListPage />)} />
       <Route path={routePaths.karyawan} element={protectedElement(SYSTEM_MENU_IDS.KARYAWAN, 1, <KaryawanListPage />)} />
       <Route path={routePaths.brand} element={protectedElement(SYSTEM_MENU_IDS.BRAND, 1, <BrandListPage />)} />

@@ -3,6 +3,8 @@ import {
   TrendingUp,
   AlertTriangle,
   UserPlus,
+  BarChart2,
+  Hash,
 } from 'lucide-react';
 import { NotationDataPoint } from '@/core/domain/models/ReportNotation';
 import { NotationMultiSeriesChart, NotationSeriesConfig } from './NotationMultiSeriesChart';
@@ -12,6 +14,8 @@ interface NotationChartsGridProps {
   data: NotationDataPoint[];
   selectedPeriod?: string | number | 'all';
   onSelectPeriod?: (periodKey: string | number) => void;
+  mode?: 'percentage' | 'absolute';
+  onModeChange?: (mode: 'percentage' | 'absolute') => void;
 }
 
 // Config 1: SK (Stok Kurang), SL (Stok Laku), OOS (Out Of Stock)
@@ -79,9 +83,64 @@ export const NotationChartsGrid: React.FC<NotationChartsGridProps> = ({
   data,
   selectedPeriod,
   onSelectPeriod,
+  mode = 'percentage',
+  onModeChange,
 }) => {
+  const isPercent = mode === 'percentage';
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-3.5">
+      {/* Mode Switcher Banner */}
+      <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600">
+            <TrendingUp className="w-4 h-4" />
+          </div>
+          <div>
+            <h2 className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              Grafik Tren Notasi Salesmanship
+              <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                Mode: {isPercent ? 'Rasio % (Pembagi Callmade)' : 'Angka Absolut (Toko & Pack)'}
+              </span>
+            </h2>
+            <p className="text-[11px] text-slate-500">
+              {isPercent
+                ? 'Persentase rasio toko terhadap total kunjungan (callmade) dan rata-rata pack per kunjungan.'
+                : 'Jumlah riil toko yang mengalami kondisi notasi dan estimasi akumulasi pack fisik.'}
+            </p>
+          </div>
+        </div>
+
+        {/* Toggle Switcher Buttons */}
+        <div className="inline-flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => onModeChange?.('percentage')}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md transition-all cursor-pointer ${isPercent
+              ? 'bg-white text-indigo-700 shadow-xs font-bold border border-slate-200/80'
+              : 'text-slate-600 hover:text-slate-900'
+              }`}
+            title="Tampilkan Rasio (%) terhadap Total Kunjungan (Default)"
+          >
+            <BarChart2 className={`w-3.5 h-3.5 ${isPercent ? 'text-indigo-600' : ''}`} />
+            <span>Rasio %</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onModeChange?.('absolute')}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md transition-all cursor-pointer ${!isPercent
+              ? 'bg-white text-slate-900 shadow-xs font-bold border border-slate-200/80'
+              : 'text-slate-600 hover:text-slate-900'
+              }`}
+            title="Tampilkan Angka Riil Absolut Toko & Pack"
+          >
+            <Hash className={`w-3.5 h-3.5 ${!isPercent ? 'text-primary-600' : ''}`} />
+            <span>Absolut</span>
+          </button>
+        </div>
+      </div>
+
       {/* 2x2 Grid of Independent Multi-Line Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Grafik 1: SK, SL, OOS */}
@@ -94,6 +153,7 @@ export const NotationChartsGrid: React.FC<NotationChartsGridProps> = ({
           series={SERIES_CHART_1}
           selectedPeriod={selectedPeriod}
           onSelectPeriod={onSelectPeriod}
+          mode={mode}
         />
 
         {/* Grafik 2: SD, TL */}
@@ -106,6 +166,7 @@ export const NotationChartsGrid: React.FC<NotationChartsGridProps> = ({
           series={SERIES_CHART_2}
           selectedPeriod={selectedPeriod}
           onSelectPeriod={onSelectPeriod}
+          mode={mode}
         />
 
         {/* Grafik 3: BPJ, SB */}
@@ -118,6 +179,7 @@ export const NotationChartsGrid: React.FC<NotationChartsGridProps> = ({
           series={SERIES_CHART_3}
           selectedPeriod={selectedPeriod}
           onSelectPeriod={onSelectPeriod}
+          mode={mode}
         />
 
         {/* Grafik 4: Avg Stock, Avg Buy */}
@@ -125,8 +187,10 @@ export const NotationChartsGrid: React.FC<NotationChartsGridProps> = ({
           data={data}
           selectedPeriod={selectedPeriod}
           onSelectPeriod={onSelectPeriod}
+          mode={mode}
         />
       </div>
     </div>
   );
 };
+

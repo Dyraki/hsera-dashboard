@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { User } from '@/core/domain/models/User';
+import { routePaths } from '@/routes/routePaths';
 import {
   Bell,
   ChevronDown,
   LogOut,
   Building2,
-  Menu
+  Menu,
+  ShieldCheck,
+  User as UserIcon
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -56,6 +60,7 @@ export const getRoleManagementDisplay = (user: User | null): string => {
 };
 
 export const Header: React.FC<HeaderProps> = ({ sidebarOpen = false, setSidebarOpen }) => {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const roleDisplay = getRoleManagementDisplay(user);
@@ -144,9 +149,33 @@ export const Header: React.FC<HeaderProps> = ({ sidebarOpen = false, setSidebarO
                   </span>
                 )}
               </div>
+
+              <div className="py-1 border-b border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    navigate(routePaths.profile);
+                  }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2 rounded-md text-xs font-semibold text-gray-700 hover:text-indigo-600 hover:bg-indigo-50/60 transition-colors"
+                >
+                  <UserIcon size={15} className="text-gray-400 group-hover:text-indigo-600" /> Profil Saya
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    navigate(routePaths.security);
+                  }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2 rounded-md text-xs font-semibold text-gray-700 hover:text-indigo-600 hover:bg-indigo-50/60 transition-colors"
+                >
+                  <ShieldCheck size={15} className="text-gray-400 group-hover:text-indigo-600" /> Keamanan Akun
+                </button>
+              </div>
+
               <button
                 onClick={logout}
-                className="flex w-full items-center gap-2.5 px-3 py-2 rounded-md text-body-sm font-semibold text-error-600 hover:bg-error-50 transition-colors"
+                className="flex w-full items-center gap-2.5 px-3 py-2 rounded-md text-body-sm font-semibold text-error-600 hover:bg-error-50 transition-colors mt-1"
               >
                 <LogOut size={16} /> Keluar
               </button>

@@ -19,6 +19,7 @@ interface NotationMultiSeriesChartProps {
   series: NotationSeriesConfig[];
   selectedPeriod?: string | number | 'all';
   onSelectPeriod?: (periodKey: string | number) => void;
+  mode?: 'percentage' | 'absolute';
 }
 
 const formatNumber = (num: number) => new Intl.NumberFormat('id-ID').format(num);
@@ -32,9 +33,13 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
   series,
   selectedPeriod,
   onSelectPeriod,
+  mode = 'percentage',
 }) => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [showInfo, setShowInfo] = useState<boolean>(false);
+
+  const isPercent = mode === 'percentage';
+  const effectiveUnit = isPercent ? '% Kunjungan' : (unit || 'Toko');
 
   if (data.length === 0) {
     return (
@@ -47,14 +52,20 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
   // Calculate scales (Independent max across all series)
   const allValues: number[] = [];
   data.forEach((d) => {
+    const calls = Number(d.totalCalls || 0);
+    const brandCount = Number(d.brandCount || 1);
+    const denominator = Math.max(1, calls * brandCount);
+
     series.forEach((s) => {
-      const val = Number(d[s.key] || 0);
+      const rawVal = Number(d[s.key] || 0);
+      const percentVal = calls > 0 ? Math.round((rawVal / denominator) * 1000) / 10 : 0;
+      const val = isPercent ? percentVal : rawVal;
       allValues.push(val);
     });
   });
 
   const maxVal = Math.max(...allValues, 0);
-  const maxValue = Math.max(10, Math.ceil(maxVal * 1.15));
+  const maxValue = Math.max(isPercent ? 10 : 10, Math.ceil(maxVal * 1.15));
 
   const chartHeight = 210;
   const chartWidth = 560;
@@ -74,11 +85,23 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
 
   // Build independent path for each series
   const seriesPaths = series.map((s) => {
-    const points = data.map((d, idx) => ({
-      x: getX(idx),
-      y: getY(Number(d[s.key] || 0)),
-      val: Number(d[s.key] || 0),
-    }));
+    const points = data.map((d, idx) => {
+      const rawVal = Number(d[s.key] || 0);
+      const calls = Number(d.totalCalls || 0);
+      const brandCount = Number(d.brandCount || 1);
+      const denominator = Math.max(1, calls * brandCount);
+      const percentVal = calls > 0 ? Math.round((rawVal / denominator) * 1000) / 10 : 0;
+      const val = isPercent ? percentVal : rawVal;
+
+      return {
+        x: getX(idx),
+        y: getY(val),
+        val,
+        rawVal,
+        calls,
+        brandCount,
+      };
+    });
 
     const totalVal = points.reduce((sum, p) => sum + p.val, 0);
     const isZeroSeries = totalVal === 0;
@@ -103,7 +126,7 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
     };
   });
 
-  // Y-axis grid ticks (4 ticks with absolute numbers)
+  // Y-axis grid ticks (4 ticks)
   const yTicks = [0, Math.round(maxValue * 0.33), Math.round(maxValue * 0.66), maxValue];
 
   const allSeriesZero = maxVal === 0;
@@ -120,7 +143,7 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
             <h3 className="text-sm font-bold text-gray-900 tracking-tight flex items-center gap-1.5">
               {title}
               <span className="text-[10px] font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
-                Satuan: {unit} (Absolut)
+                Satuan: {effectiveUnit} {isPercent ? '(Dibagi Callmade)' : '(Absolut)'}
               </span>
             </h3>
             <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>
@@ -168,7 +191,7 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
           viewBox={`0 0 ${chartWidth} ${chartHeight}`}
           className="w-full h-48 sm:h-52 overflow-visible"
         >
-          {/* Background Grid Lines & Y-ticks (Nilai Sumbu Y Absolut) */}
+          {/* Background Grid Lines & Y-ticks */}
           {yTicks.map((tickVal, idx) => {
             const y = getY(tickVal);
             return (
@@ -191,7 +214,7 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
                   fontFamily="monospace"
                   fontWeight="600"
                 >
-                  {formatNumber(tickVal)}
+                  {isPercent ? `${tickVal}%` : formatNumber(tickVal)}
                 </text>
               </g>
             );
@@ -277,7 +300,7 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
                         strokeWidth={isHovered ? 3 : 2}
                         className="transition-transform duration-200"
                       />
-                      {/* Nilai Absolute Langsung di Grafik */}
+                      {/* Nilai Langsung di Grafik */}
                       <text
                         x={pt.x}
                         y={pt.y - 8}
@@ -290,7 +313,7 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
                         strokeWidth="2.5"
                         paintOrder="stroke fill"
                       >
-                        {formatNumber(pt.val)}
+                        {isPercent ? `${pt.val.toFixed(1)}%` : formatNumber(pt.val)}
                       </text>
                     </g>
                   );
@@ -367,7 +390,11 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
 
             <div className="space-y-1">
               {series.map((s) => {
-                const val = Number(data[hoveredIdx][s.key] || 0);
+                const rawVal = Number(data[hoveredIdx][s.key] || 0);
+                const calls = Number(data[hoveredIdx].totalCalls || 0);
+                const brandCount = Number(data[hoveredIdx].brandCount || 1);
+                const denominator = Math.max(1, calls * brandCount);
+                const percentVal = calls > 0 ? Math.round((rawVal / denominator) * 1000) / 10 : 0;
                 return (
                   <div key={s.code} className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-1.5">
@@ -379,9 +406,16 @@ export const NotationMultiSeriesChart: React.FC<NotationMultiSeriesChartProps> =
                         {s.code} ({s.label})
                       </span>
                     </div>
-                    <span className={`font-bold font-mono ${val > 0 ? 'text-white' : 'text-gray-500'}`}>
-                      {formatNumber(val)} {unit}
-                    </span>
+                    <div className="text-right">
+                      <span className={`font-bold font-mono ${rawVal > 0 ? 'text-white' : 'text-gray-500'}`}>
+                        {isPercent ? `${percentVal.toFixed(1)}%` : `${formatNumber(rawVal)} ${unit}`}
+                      </span>
+                      {isPercent && (
+                        <span className="text-[10px] text-gray-400 ml-1.5 font-mono">
+                          ({formatNumber(rawVal)}/{formatNumber(calls)} call{brandCount > 1 ? ` x ${brandCount} bnd` : ''})
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })}

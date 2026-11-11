@@ -63,7 +63,7 @@ export const NotationHeaderFilter: React.FC<NotationHeaderFilterProps> = ({
             <h1 className="text-base font-bold text-gray-900 tracking-tight flex items-center gap-2">
               Laporan Notasi Salesmanship & Pergerakan Brand
               <span className="text-[10px] font-semibold uppercase tracking-wider bg-indigo-100/70 text-indigo-700 px-2 py-0.5 rounded-full border border-indigo-200/50">
-                Nilai Absolut Nyata
+                Rasio % & Nilai Absolut
               </span>
             </h1>
             <p className="text-xs text-gray-500">

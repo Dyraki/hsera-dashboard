@@ -6,6 +6,7 @@ interface NotationAvgQuantityChartProps {
   data: NotationDataPoint[];
   selectedPeriod?: string | number | 'all';
   onSelectPeriod?: (periodKey: string | number) => void;
+  mode?: 'percentage' | 'absolute';
 }
 
 const formatDecimal = (num: number) =>
@@ -14,13 +15,29 @@ const formatDecimal = (num: number) =>
     maximumFractionDigits: 1,
   }).format(num);
 
+const formatNumber = (num: number) =>
+  new Intl.NumberFormat('id-ID').format(num);
+
 export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> = ({
   data,
   selectedPeriod,
   onSelectPeriod,
+  mode = 'percentage',
 }) => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [showInfo, setShowInfo] = useState<boolean>(false);
+
+  const isPercent = mode === 'percentage';
+
+  const getStockVal = (d: NotationDataPoint) =>
+    isPercent
+      ? d.avgStock
+      : (d.totalStockPack ?? Math.round(d.avgStock * (d.totalCalls || 0) * (d.brandCount || 1)));
+
+  const getBuyVal = (d: NotationDataPoint) =>
+    isPercent
+      ? d.avgBuy
+      : (d.totalBuyPack ?? Math.round(d.avgBuy * (d.totalCalls || 0) * (d.brandCount || 1)));
 
   if (data.length === 0) {
     return (
@@ -31,9 +48,9 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
   }
 
   // Calculate scales (Independent max between avgStock and avgBuy)
-  const maxStock = Math.max(...data.map((d) => d.avgStock), 0);
-  const maxBuy = Math.max(...data.map((d) => d.avgBuy), 0);
-  const maxValue = Math.max(10, Math.ceil(Math.max(maxStock, maxBuy) * 1.2));
+  const maxStock = Math.max(...data.map(getStockVal), 0);
+  const maxBuy = Math.max(...data.map(getBuyVal), 0);
+  const maxValue = Math.max(isPercent ? 5 : 10, Math.ceil(Math.max(maxStock, maxBuy) * 1.2));
 
   const chartHeight = 210;
   const chartWidth = 560;
@@ -57,8 +74,8 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
   // Stock points & path
   const stockPoints = data.map((d, idx) => ({
     x: getX(idx),
-    y: getY(d.avgStock),
-    val: d.avgStock,
+    y: getY(getStockVal(d)),
+    val: getStockVal(d),
   }));
   // Garis kuantitas hanya menghubungkan sampai Week Efektif / Minggu Berjalan saat ini
   const effectiveStockPoints = stockPoints.filter((_, idx) => !data[idx]?.isFuture);
@@ -73,8 +90,8 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
   // Buy points & path
   const buyPoints = data.map((d, idx) => ({
     x: getX(idx),
-    y: getY(d.avgBuy),
-    val: d.avgBuy,
+    y: getY(getBuyVal(d)),
+    val: getBuyVal(d),
   }));
   const effectiveBuyPoints = buyPoints.filter((_, idx) => !data[idx]?.isFuture);
   const buyPath =
@@ -87,6 +104,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
 
   const yTicks = [0, Math.round(maxValue * 0.33), Math.round(maxValue * 0.66), maxValue];
   const allZero = maxStock === 0 && maxBuy === 0;
+  const formatTick = (val: number) => (isPercent ? formatDecimal(val) : formatNumber(val));
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col justify-between transition-all duration-200 hover:shadow-sm">
@@ -100,11 +118,13 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
             <h3 className="text-sm font-bold text-gray-900 tracking-tight flex items-center gap-1.5">
               Kedalaman Stok & Kuantitas Transaksi
               <span className="text-[10px] font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
-                Satuan: Pack / Callmade (Kunjungan)
+                Satuan: {isPercent ? 'Pack / Callmade (Kunjungan)' : 'Total Pack Fisik (Absolut)'}
               </span>
             </h3>
             <p className="text-xs text-gray-500 mt-0.5">
-              Avg Stock (Sisa stok per callmade) vs Avg Buy (Ukuran belanja per callmade / Drop Size)
+              {isPercent
+                ? 'Avg Stock (Sisa stok per callmade) vs Avg Buy (Ukuran belanja per callmade / Drop Size)'
+                : 'Total Estimasi Sisa Stok (Pack) vs Total Pembelian (Pack)'}
             </p>
           </div>
         </div>
@@ -128,18 +148,24 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
       {showInfo && (
         <div className="mb-3 p-3 bg-sky-50/70 border border-sky-100 rounded-lg text-xs space-y-1.5 animate-fade-in">
           <p className="font-bold text-sky-900 text-[11px] uppercase tracking-wider">
-            Arti Bisnis Kuantitas per Kunjungan (Callmade):
+            Arti Bisnis Kuantitas Stok & Pembelian:
           </p>
           <div className="flex items-start gap-2">
             <span className="w-2.5 h-2.5 rounded-full mt-1 shrink-0 bg-sky-600" />
             <p className="text-gray-700">
-              <strong className="text-gray-900">Avg Stock:</strong> Rata-rata pack fisik sisa stok yang masih berada di etalase outlet dibagi total callmade (kunjungan salesman).
+              <strong className="text-gray-900">{isPercent ? 'Avg Stock' : 'Total Stok'}:</strong>{' '}
+              {isPercent
+                ? 'Rata-rata pack fisik sisa stok yang masih berada di etalase outlet dibagi total callmade (kunjungan salesman).'
+                : 'Estimasi total pack sisa stok produk yang berada di etalase seluruh outlet.'}
             </p>
           </div>
           <div className="flex items-start gap-2">
             <span className="w-2.5 h-2.5 rounded-full mt-1 shrink-0 bg-amber-600" />
             <p className="text-gray-700">
-              <strong className="text-gray-900">Avg Buy (Drop Size):</strong> Rata-rata pack fisik pembelian outlet dibagi total callmade (kunjungan salesman).
+              <strong className="text-gray-900">{isPercent ? 'Avg Buy (Drop Size)' : 'Total Pembelian'}:</strong>{' '}
+              {isPercent
+                ? 'Rata-rata pack fisik pembelian outlet dibagi total callmade (kunjungan salesman).'
+                : 'Estimasi total pack produk yang dibeli/dipesan oleh seluruh outlet.'}
             </p>
           </div>
         </div>
@@ -151,7 +177,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
           viewBox={`0 0 ${chartWidth} ${chartHeight}`}
           className="w-full h-48 sm:h-52 overflow-visible"
         >
-          {/* Y-axis Grids & Ticks (Nilai Sumbu Y Rata-rata per Kunjungan) */}
+          {/* Y-axis Grids & Ticks */}
           {yTicks.map((tickVal, idx) => {
             const y = getY(tickVal);
             return (
@@ -174,7 +200,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
                   fontFamily="monospace"
                   fontWeight="600"
                 >
-                  {formatDecimal(tickVal)}
+                  {formatTick(tickVal)}
                 </text>
               </g>
             );
@@ -221,7 +247,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
             );
           })}
 
-          {/* Line 1: Avg Stock (Sky Blue) - Hanya digambar jika maxStock > 0 */}
+          {/* Line 1: Stock (Sky Blue) */}
           {!isZeroStock && (
             <g key="path-stock">
               <path
@@ -234,7 +260,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
                 className="transition-all duration-300"
               />
               {stockPoints.map((pt, pIdx) => {
-                if (pt.val === 0 || data[pIdx]?.isFuture) return null; // Titik & angka 0 atau future weeks tidak ditampilkan
+                if (pt.val === 0 || data[pIdx]?.isFuture) return null;
 
                 const isHovered = hoveredIdx === pIdx;
                 const isCurrent = data[pIdx]?.isCurrent;
@@ -261,7 +287,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
                       strokeWidth="2.5"
                       paintOrder="stroke fill"
                     >
-                      {formatDecimal(pt.val)}
+                      {isPercent ? formatDecimal(pt.val) : formatNumber(pt.val)}
                     </text>
                   </g>
                 );
@@ -269,7 +295,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
             </g>
           )}
 
-          {/* Line 2: Avg Buy (Amber) - Hanya digambar jika maxBuy > 0 */}
+          {/* Line 2: Buy (Amber) */}
           {!isZeroBuy && (
             <g key="path-buy">
               <path
@@ -282,7 +308,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
                 className="transition-all duration-300"
               />
               {buyPoints.map((pt, pIdx) => {
-                if (pt.val === 0 || data[pIdx]?.isFuture) return null; // Titik & angka 0 atau future weeks tidak ditampilkan
+                if (pt.val === 0 || data[pIdx]?.isFuture) return null;
 
                 const isHovered = hoveredIdx === pIdx;
                 const isCurrent = data[pIdx]?.isCurrent;
@@ -309,7 +335,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
                       strokeWidth="2.5"
                       paintOrder="stroke fill"
                     >
-                      {formatDecimal(pt.val)}
+                      {isPercent ? formatDecimal(pt.val) : formatNumber(pt.val)}
                     </text>
                   </g>
                 );
@@ -327,7 +353,7 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
               fill="#94a3b8"
               fontWeight="500"
             >
-              Semua nilai kuantitas pada periode ini adalah 0 Pack / Call
+              Semua nilai kuantitas pada periode ini adalah 0 {isPercent ? 'Pack / Call' : 'Pack'}
             </text>
           )}
 
@@ -387,20 +413,28 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-sky-500" />
-                  <span className="text-gray-300">Avg Stock (Sisa per Call)</span>
+                  <span className="text-gray-300">
+                    {isPercent ? 'Avg Stock (Sisa per Call)' : 'Total Sisa Stok'}
+                  </span>
                 </div>
                 <span className={`font-bold font-mono ${data[hoveredIdx].avgStock > 0 ? 'text-white' : 'text-gray-500'}`}>
-                  {formatDecimal(data[hoveredIdx].avgStock)} Pack / Call
+                  {isPercent
+                    ? `${formatDecimal(data[hoveredIdx].avgStock)} Pack / Call`
+                    : `${formatNumber(data[hoveredIdx].totalStockPack ?? Math.round(data[hoveredIdx].avgStock * (data[hoveredIdx].totalCalls || 0) * (data[hoveredIdx].brandCount || 1)))} Pack`}
                 </span>
               </div>
 
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-amber-500" />
-                  <span className="text-gray-300">Avg Buy (Drop Size per Call)</span>
+                  <span className="text-gray-300">
+                    {isPercent ? 'Avg Buy (Drop Size per Call)' : 'Total Pembelian'}
+                  </span>
                 </div>
                 <span className={`font-bold font-mono ${data[hoveredIdx].avgBuy > 0 ? 'text-white' : 'text-gray-500'}`}>
-                  {formatDecimal(data[hoveredIdx].avgBuy)} Pack / Call
+                  {isPercent
+                    ? `${formatDecimal(data[hoveredIdx].avgBuy)} Pack / Call`
+                    : `${formatNumber(data[hoveredIdx].totalBuyPack ?? Math.round(data[hoveredIdx].avgBuy * (data[hoveredIdx].totalCalls || 0) * (data[hoveredIdx].brandCount || 1)))} Pack`}
                 </span>
               </div>
             </div>
@@ -414,24 +448,36 @@ export const NotationAvgQuantityChart: React.FC<NotationAvgQuantityChartProps> =
           className={`flex items-center gap-1.5 transition-opacity ${
             isZeroStock ? 'opacity-40' : 'opacity-100'
           }`}
-          title="Rata-rata pack fisik sisa stok di etalase outlet dibagi total kunjungan (callmade)"
+          title={
+            isPercent
+              ? 'Rata-rata pack fisik sisa stok di etalase outlet dibagi total kunjungan (callmade)'
+              : 'Estimasi total sisa pack fisik di seluruh outlet'
+          }
         >
           <span className="w-3 h-1 rounded-full shrink-0 bg-sky-600" />
-          <span className="font-bold text-gray-800 text-[11px]">Avg Stock</span>
+          <span className="font-bold text-gray-800 text-[11px]">
+            {isPercent ? 'Avg Stock' : 'Total Stok'}
+          </span>
           <span className="text-gray-500 text-[11px]">
-            (Pack / Call){isZeroStock ? ' [0]' : ''}
+            ({isPercent ? 'Pack / Call' : 'Pack'}){isZeroStock ? ' [0]' : ''}
           </span>
         </div>
         <div
           className={`flex items-center gap-1.5 transition-opacity ${
             isZeroBuy ? 'opacity-40' : 'opacity-100'
           }`}
-          title="Rata-rata pack fisik pembelian outlet dibagi total kunjungan (callmade) / Drop Size"
+          title={
+            isPercent
+              ? 'Rata-rata pack fisik pembelian outlet dibagi total kunjungan (callmade) / Drop Size'
+              : 'Estimasi total pack pembelian seluruh outlet'
+          }
         >
           <span className="w-3 h-1 rounded-full shrink-0 bg-amber-600" />
-          <span className="font-bold text-gray-800 text-[11px]">Avg Buy</span>
+          <span className="font-bold text-gray-800 text-[11px]">
+            {isPercent ? 'Avg Buy' : 'Total Beli'}
+          </span>
           <span className="text-gray-500 text-[11px]">
-            (Drop Size - Pack / Call){isZeroBuy ? ' [0]' : ''}
+            ({isPercent ? 'Drop Size - Pack / Call' : 'Pack'}){isZeroBuy ? ' [0]' : ''}
           </span>
         </div>
       </div>

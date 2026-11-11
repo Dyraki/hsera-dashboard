@@ -25,7 +25,11 @@ import {
   Users,
   RefreshCw,
   User,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
+import { validatePassword, generateStrongPassword } from '@/core/utils/passwordSecurity';
+import { PasswordStrengthMeter } from '@/presentation/components/form/PasswordStrengthMeter';
 
 export const RoleUserPage: React.FC = () => {
   const [users, setUsers] = useState<ManagedUser[]>([]);
@@ -48,6 +52,9 @@ export const RoleUserPage: React.FC = () => {
   const [formId, setFormId] = useState('');
   const [formUsername, setFormUsername] = useState('');
   const [formPassword, setFormPassword] = useState('');
+  const [formConfirmPassword, setFormConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formAktif, setFormAktif] = useState(1);
   const [formTgl1, setFormTgl1] = useState('');
   const [formTgl2, setFormTgl2] = useState('');
@@ -89,6 +96,9 @@ export const RoleUserPage: React.FC = () => {
     setFormId(crypto.randomUUID());
     setFormUsername('');
     setFormPassword('');
+    setFormConfirmPassword('');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     setFormAktif(1);
     const today = new Date().toISOString().split('T')[0];
     setFormTgl1(today);
@@ -109,6 +119,9 @@ export const RoleUserPage: React.FC = () => {
     setFormId(user.id);
     setFormUsername(user.username);
     setFormPassword('');
+    setFormConfirmPassword('');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     setFormAktif(user.aktif);
     setFormTgl1(user.tgl1 ? user.tgl1.split('T')[0] : '');
     setFormTgl2(user.tgl2 ? user.tgl2.split('T')[0] : '');
@@ -137,6 +150,30 @@ export const RoleUserPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validasi Password Standar Internasional (NIST SP 800-63B & OWASP)
+    if (modalMode === 'create') {
+      const pwdValidation = validatePassword(formPassword, formUsername);
+      if (!pwdValidation.isValid) {
+        showToast('error', pwdValidation.errors[0] || 'Password belum memenuhi standar keamanan internasional.');
+        return;
+      }
+      if (formPassword !== formConfirmPassword) {
+        showToast('error', 'Konfirmasi password tidak cocok dengan password yang dimasukkan.');
+        return;
+      }
+    } else if (modalMode === 'edit' && formPassword.trim().length > 0) {
+      const pwdValidation = validatePassword(formPassword, formUsername);
+      if (!pwdValidation.isValid) {
+        showToast('error', pwdValidation.errors[0] || 'Password baru belum memenuhi standar keamanan internasional.');
+        return;
+      }
+      if (formPassword !== formConfirmPassword) {
+        showToast('error', 'Konfirmasi password baru tidak cocok.');
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -430,6 +467,16 @@ export const RoleUserPage: React.FC = () => {
               variant="primary"
               size="md"
               isLoading={isSubmitting}
+              disabled={
+                isSubmitting ||
+                (modalMode === 'create' &&
+                  (!validatePassword(formPassword, formUsername).isValid ||
+                    formPassword !== formConfirmPassword)) ||
+                (modalMode === 'edit' &&
+                  formPassword.trim().length > 0 &&
+                  (!validatePassword(formPassword, formUsername).isValid ||
+                    formPassword !== formConfirmPassword))
+              }
             >
               {modalMode === 'create' ? 'Tambah Pengguna' : 'Simpan Data'}
             </Button>
@@ -459,21 +506,81 @@ export const RoleUserPage: React.FC = () => {
                 />
               </div>
 
-              <Input
-                label={modalMode === 'edit' ? 'Password Baru (Kosongkan jika tidak diubah)' : 'Password'}
-                type="password"
-                value={formPassword}
-                onChange={(e) => setFormPassword(e.target.value)}
-                disabled={isSubmitting}
-                required={modalMode === 'create'}
-                placeholder={modalMode === 'edit' ? '••••••••' : 'Masukkan password akun'}
-                prefixIcon={<Key size={16} />}
-                helperText={
-                  modalMode === 'edit'
-                    ? 'Kosongkan jika tidak ingin mengubah password yang sudah ada.'
-                    : undefined
-                }
-              />
+              {/* Password & Confirm Password Section dengan Standard Internasional */}
+              <div className="space-y-3.5 pt-1 border-t border-gray-100">
+                <Input
+                  label={modalMode === 'edit' ? 'Password Baru (Kosongkan jika tidak diubah)' : 'Password Akun'}
+                  type={showPassword ? 'text' : 'password'}
+                  value={formPassword}
+                  onChange={(e) => setFormPassword(e.target.value)}
+                  disabled={isSubmitting}
+                  required={modalMode === 'create'}
+                  placeholder={modalMode === 'edit' ? '••••••••' : 'Masukkan password akun yang aman'}
+                  prefixIcon={<Key size={16} />}
+                  suffixIcon={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-gray-400 hover:text-gray-600 focus:outline-hidden cursor-pointer"
+                      title={showPassword ? 'Sembunyikan password' : 'Lihat password'}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  }
+                  helperText={
+                    modalMode === 'edit'
+                      ? 'Kosongkan jika tidak ingin mengubah password yang sudah ada.'
+                      : undefined
+                  }
+                />
+
+                {/* Input Konfirmasi Password (Tampil jika create atau jika admin mulai mengetik password baru pada edit) */}
+                {(modalMode === 'create' || formPassword.length > 0) && (
+                  <Input
+                    label={modalMode === 'edit' ? 'Konfirmasi Password Baru' : 'Ulangi / Konfirmasi Password'}
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formConfirmPassword}
+                    onChange={(e) => setFormConfirmPassword(e.target.value)}
+                    disabled={isSubmitting}
+                    required={modalMode === 'create' || formPassword.length > 0}
+                    placeholder="Ketik ulang password untuk konfirmasi"
+                    prefixIcon={<Key size={16} />}
+                    suffixIcon={
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="text-gray-400 hover:text-gray-600 focus:outline-hidden cursor-pointer"
+                        title={showConfirmPassword ? 'Sembunyikan konfirmasi' : 'Lihat konfirmasi'}
+                      >
+                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    }
+                    error={
+                      formConfirmPassword.length > 0 && formPassword !== formConfirmPassword
+                        ? 'Konfirmasi password tidak cocok'
+                        : undefined
+                    }
+                  />
+                )}
+
+                {/* Password Strength Meter & NIST/OWASP Live Checklist */}
+                {(modalMode === 'create' || formPassword.length > 0) && (
+                  <PasswordStrengthMeter
+                    result={validatePassword(formPassword, formUsername)}
+                    password={formPassword}
+                    confirmPassword={formConfirmPassword}
+                    showChecklist={true}
+                    onGeneratePassword={() => {
+                      const newPass = generateStrongPassword(14);
+                      setFormPassword(newPass);
+                      setFormConfirmPassword(newPass);
+                      setShowPassword(true);
+                      setShowConfirmPassword(true);
+                      showToast('success', 'Password acak aman (14 karakter) telah dibuat otomatis.');
+                    }}
+                  />
+                )}
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <Select

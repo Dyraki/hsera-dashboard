@@ -5,6 +5,7 @@ import { NotationHeaderFilter } from './components/NotationHeaderFilter';
 import { NotationChartsGrid } from './components/NotationChartsGrid';
 import { KpiReportSummaryCards } from '../ReportKpi/components/KpiReportSummaryCards';
 import { SkuSalesMatrixTable } from '../ReportSku/components/SkuSalesMatrixTable';
+import { BrandNotationMatrixTable } from '@/presentation/pages/Dashboard/components/BrandNotationMatrixTable';
 import { AlertCircle, FileQuestion } from 'lucide-react';
 
 export const ReportNotasiPage: React.FC = () => {
@@ -30,18 +31,33 @@ export const ReportNotasiPage: React.FC = () => {
     handlePrint,
   } = useNotationReport();
 
-  const [highlightedPeriod, setHighlightedPeriod] = useState<string | number | 'all'>('all');
+  const [highlightedDay, setHighlightedDay] = useState<string | number | 'all'>('all');
+  const [displayMode, setDisplayMode] = useState<'percentage' | 'absolute'>('percentage');
 
   const handleSelectPeriod = (periodKey: string | number) => {
-    if (highlightedPeriod === periodKey) {
-      setHighlightedPeriod('all');
+    if (filters.selectedWeek === 'all') {
+      // Pada tampilan Kuartal: klik titik minggu akan memfilter laporan ke minggu tersebut
+      handleFilterChange({ selectedWeek: periodKey as any });
+      setHighlightedDay('all');
     } else {
-      setHighlightedPeriod(periodKey);
+      // Pada tampilan Satu Minggu: klik titik hari akan menyorot hari tersebut
+      if (highlightedDay === periodKey) {
+        setHighlightedDay('all');
+      } else {
+        setHighlightedDay(periodKey);
+      }
     }
   };
 
   const activePeriod =
-    filters.selectedWeek !== 'all' ? filters.selectedWeek : highlightedPeriod;
+    filters.selectedWeek !== 'all' ? highlightedDay : 'all';
+
+  const sessionWeekDisplay =
+    filters.selectedWeek === 'all'
+      ? 'Kuartal Penuh'
+      : highlightedDay !== 'all'
+      ? `Minggu ${filters.selectedWeek} (Hari ${highlightedDay})`
+      : `Minggu ${filters.selectedWeek}`;
 
   return (
     <AdminLayout>
@@ -104,11 +120,26 @@ export const ReportNotasiPage: React.FC = () => {
               totalWeeks={reportData.skuMatrix?.weeks?.length || 0}
             />
 
-            {/* 4 UI Grafis Analisis Notasi (Angka Absolut Toko & Pack) */}
+            {/* 4 UI Grafis Analisis Notasi (Default Rasio % dengan Pembagi Callmade, atau Absolut) */}
             <NotationChartsGrid
               data={reportData.notationTrend}
               selectedPeriod={activePeriod}
               onSelectPeriod={handleSelectPeriod}
+              mode={displayMode}
+              onModeChange={setDisplayMode}
+            />
+
+            {/* Matriks Rekap Notasi Per Brand (Default Rasio % dengan Pembagi Callmade, atau Absolut) */}
+            <BrandNotationMatrixTable
+              brandMatrix={reportData.brandMatrix?.rows}
+              consolidation={reportData.brandMatrix?.consolidation}
+              callmadeTotal={reportData.brandMatrix?.callmade ?? reportData.summary?.kunjungan?.realisasi ?? 0}
+              sessionWeekDisplay={sessionWeekDisplay}
+              displayMode={displayMode}
+              onToggleDisplayMode={setDisplayMode}
+              showCallmadeColumn={true}
+              title={`Matriks Rekap Notasi Per Brand (${displayMode === 'percentage' ? 'Rasio % terhadap Callmade' : 'Angka Absolut Toko & Pack'})`}
+              loading={isLoading}
             />
 
             {/* Matriks Penjualan Produk SKU per Minggu */}

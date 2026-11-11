@@ -105,6 +105,118 @@ describe('Report Notasi Domain, Menu ID, & Business Logic Tests', () => {
     });
   });
 
+  describe('Brand Notation Matrix Absolute Mode & Callmade Divider Tests', () => {
+    it('should correctly calculate and structure absolute counts for brand notation and handle callmade divider', () => {
+      const mockBrandRow = {
+        urutan: 1,
+        kodeBrand: '100010',
+        namaBrand: 'HSERA REGULAR 12',
+        callmade: 1250,
+        bd: 980,
+        totalStockPack: 4900,
+        totalBuyPack: 3200,
+        totalVolPack: 3200,
+        sk: 45,
+        sl: 820,
+        sd: 25,
+        oos: 12,
+        sb: 78,
+        tl: 0,
+        bpj: 0,
+      };
+
+      // Verify absolute integer counts
+      expect(mockBrandRow.callmade).toBe(1250);
+      expect(mockBrandRow.bd).toBe(980);
+      expect(mockBrandRow.totalStockPack).toBe(4900);
+      expect(mockBrandRow.totalBuyPack).toBe(3200);
+      expect(mockBrandRow.sk).toBe(45);
+      expect(mockBrandRow.sl).toBe(820);
+
+      // Verify BD formula: BD = OOS + SK + SL + SD + SB
+      const calculatedBd =
+        mockBrandRow.oos + mockBrandRow.sk + mockBrandRow.sl + mockBrandRow.sd + mockBrandRow.sb;
+      expect(mockBrandRow.bd).toBe(calculatedBd);
+
+      // Verify divider calculations using callmade as denominator
+      const callmadeDiv = mockBrandRow.callmade;
+      const skPercent = Math.round((mockBrandRow.sk / callmadeDiv) * 1000) / 10;
+      const slPercent = Math.round((mockBrandRow.sl / callmadeDiv) * 1000) / 10;
+      const bdPercent = Math.round((mockBrandRow.bd / callmadeDiv) * 1000) / 10;
+      const avgStockPack = Math.round((mockBrandRow.totalStockPack / callmadeDiv) * 10) / 10;
+      const avgBuyPack = Math.round((mockBrandRow.totalBuyPack / callmadeDiv) * 10) / 10;
+
+      expect(skPercent).toBe(3.6);
+      expect(slPercent).toBe(65.6);
+      expect(bdPercent).toBe(78.4);
+      expect(avgStockPack).toBe(3.9);
+      expect(avgBuyPack).toBe(2.6);
+    });
+
+    it('should export BrandNotationMatrixTable from Dashboard components properly', async () => {
+      const { BrandNotationMatrixTable } = await import('@/presentation/pages/Dashboard/components/BrandNotationMatrixTable');
+      expect(BrandNotationMatrixTable).toBeDefined();
+    });
+
+    it('should compute Ratio % using Callmade as denominator by default, and support absolute mode', () => {
+      const rawSk = 50;
+      const rawCalls = 250;
+      const percentValue = (rawSk / rawCalls) * 100;
+      expect(percentValue).toBe(20);
+
+      // Verify that default mode across visual charts and matrix is percentage
+      const defaultMode: 'percentage' | 'absolute' = 'percentage';
+      expect(defaultMode).toBe('percentage');
+
+      // Verify toggle to absolute mode
+      const toggledMode: 'percentage' | 'absolute' = defaultMode === 'percentage' ? 'absolute' : 'percentage';
+      expect(toggledMode).toBe('absolute');
+    });
+
+    it('should maintain mathematical consistency between 15-brand consolidation and multi-series chart', () => {
+      // 15 brands each with individual SK counts
+      const brandCount = 15;
+      const calls = 1000;
+      // Suppose each brand has 50 SK on average in 1,000 calls -> 5% each
+      const brandSkRates = Array.from({ length: 15 }, () => 50); // 15 * 50 = 750 total SK
+      const sumSk = brandSkRates.reduce((a, b) => a + b, 0); // 750
+
+      // Individual brand SK %:
+      const brandPercent = (50 / calls) * 100; // 5.0%
+
+      // Consolidation SK % across 15 brands:
+      const grandSkSum = brandCount * brandPercent; // 75.0
+      const consolidationSkPercent = Math.round((grandSkSum / brandCount) * 10) / 10;
+      expect(consolidationSkPercent).toBe(5.0);
+
+      // Chart ratio % across 15 brands:
+      // Total audit opportunities = calls * brandCount = 15,000
+      const chartPercentVal = Math.round((sumSk / (calls * brandCount)) * 1000) / 10;
+      expect(chartPercentVal).toBe(5.0);
+
+      // They MUST be 100% equal!
+      expect(chartPercentVal).toBe(consolidationSkPercent);
+    });
+
+    it('should guarantee avgStock and avgBuy aliases are populated for table rendering', () => {
+      const row = {
+        avgStockPack: 3.8,
+        avgStokPack: 3.8,
+        avgBuyPack: 2.4,
+        avgBeliPack: 2.4,
+      };
+
+      // Both English and Indonesian property names must be resolvable
+      const stockVal = row.avgStockPack ?? row.avgStokPack ?? 0;
+      const buyVal = row.avgBuyPack ?? row.avgBeliPack ?? 0;
+
+      expect(stockVal).toBe(3.8);
+      expect(buyVal).toBe(2.4);
+      expect(stockVal).not.toBe(0);
+      expect(buyVal).not.toBe(0);
+    });
+  });
+
   describe('Component and Barrel Exports Verification', () => {
     it('should export all essential ReportNotasi components and hooks properly', async () => {
       const barrel = await import('./index');

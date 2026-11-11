@@ -11,6 +11,8 @@ export const routePaths = {
   roleEdit: '/settings/role/edit/:id',
   roleUsers: '/settings/roleuser',
   roleUsersAlias: '/settings/role-user',
+  profile: '/settings/profile',
+  security: '/settings/security',
   operationUnits: '/master/operation-unit',
   karyawan: '/master/karyawan',
   brand: '/master/brand',

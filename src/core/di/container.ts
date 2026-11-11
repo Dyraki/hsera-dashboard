@@ -20,6 +20,8 @@ import { HttpMenuRepository } from '../infrastructure/repositories/HttpMenuRepos
 import { HttpOperationUnitRepository } from '../infrastructure/repositories/HttpOperationUnitRepository';
 import { HttpRoleRepository } from '../infrastructure/repositories/HttpRoleRepository';
 import { HttpSalesmanshipRepository } from '../infrastructure/repositories/HttpSalesmanshipRepository';
+import { HttpProfileRepository } from '../infrastructure/repositories/HttpProfileRepository';
+import { HttpSecurityRepository } from '../infrastructure/repositories/HttpSecurityRepository';
 
 const authRepository = new HttpAuthRepository();
 const karyawanRepository = new HttpKaryawanRepository();
@@ -29,6 +31,8 @@ const roleRepository = new HttpRoleRepository();
 const managedUserRepository = new HttpManagedUserRepository();
 const dashboardRepository = new HttpDashboardRepository();
 export const salesmanshipRepository = new HttpSalesmanshipRepository();
+export const profileRepository = new HttpProfileRepository();
+export const securityRepository = new HttpSecurityRepository();
 
 export const useCases = {
   authenticateUser: new AuthenticateUser(authRepository),
