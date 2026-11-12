@@ -33,15 +33,15 @@ export const DashboardHeaderBar: React.FC<DashboardHeaderBarProps> = ({
 }) => {
   const scopeName = headerContext?.scopeUnitName || 'Wilayah Operasional';
   const weekLabel = headerContext?.sessionWeekDisplay || 'W-42';
-  
+
   const quarters: QuarterOption[] = headerContext?.availableQuarters && headerContext.availableQuarters.length > 0
     ? headerContext.availableQuarters
     : [
-        { quarter: 1, label: 'Kuartal Q1 2026 (W01 - W13)' },
-        { quarter: 2, label: 'Kuartal Q2 2026 (W14 - W26)' },
-        { quarter: 3, label: 'Kuartal Q3 2026 (W27 - W39)' },
-        { quarter: 4, label: 'Kuartal Q4 2026 (W40 - W52)' },
-      ];
+      { quarter: 1, label: 'Kuartal Q1 2026 (W01 - W13)' },
+      { quarter: 2, label: 'Kuartal Q2 2026 (W14 - W26)' },
+      { quarter: 3, label: 'Kuartal Q3 2026 (W27 - W39)' },
+      { quarter: 4, label: 'Kuartal Q4 2026 (W40 - W52)' },
+    ];
 
   const formatTime = (d: Date | null) => {
     if (!d) return '--:--:--';
@@ -98,7 +98,7 @@ export const DashboardHeaderBar: React.FC<DashboardHeaderBarProps> = ({
             </span>
           </div>
           <p className="text-xs md:text-sm text-slate-500 mt-1">
-            Monitoring tren volume kuartal serta evaluasi performa callsheet, matriks 15 Brand HSERA, dan evaluasi salesman per minggu aktif.
+            Monitoring tren volume kuartal serta evaluasi performa callsheet, matriks 15 Brand HS, dan evaluasi salesman per minggu aktif.
           </p>
         </div>
 

@@ -37,6 +37,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ) => {
     const selectId = id || (label ? `select-${label.toLowerCase().replace(/\s+/g, '-')}` : undefined);
 
+    const hasEmptyOption = options?.some(
+      (opt) => opt.value === '' || opt.value === null || opt.value === undefined
+    );
+    const shouldShowPlaceholder = Boolean(placeholder) && !hasEmptyOption;
+
     const sizeClasses = {
       sm: 'h-8 text-xs pl-3 pr-8',
       md: 'h-10 text-sm pl-3.5 pr-10', // Default 40px
@@ -68,7 +73,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className={`w-full appearance-none border rounded-md font-normal text-gray-900 outline-none transition-colors duration-150 cursor-pointer disabled:cursor-not-allowed ${sizeClasses} ${stateClasses} ${className}`}
             {...props}
           >
-            {placeholder && (
+            {shouldShowPlaceholder && (
               <option value="" disabled className="text-gray-500">
                 {placeholder}
               </option>

@@ -157,6 +157,7 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
           value={formData.ouKode}
           onChange={(e) => handleOuChange(e.target.value)}
           options={ouOptions}
+          placeholder={isSuperAdmin ? '' : 'Pilih Operation Unit...'}
           disabled={isSubmitting || (!isSuperAdmin && operationUnits.length <= 1)}
           helperText={
             isSuperAdmin
@@ -171,6 +172,7 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
           value={formData.districtId}
           onChange={(e) => onChange({ ...formData, districtId: e.target.value })}
           options={districtOptions}
+          placeholder=""
           disabled={isSubmitting}
           helperText={
             formData.ouKode
@@ -185,6 +187,7 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
           value={formData.hariKunjungan}
           onChange={(e) => onChange({ ...formData, hariKunjungan: e.target.value })}
           options={HARI_KUNJUNGAN_OPTIONS}
+          placeholder=""
           disabled={isSubmitting}
           helperText="Pilih hari tertentu jika target hanya berlaku pada hari tersebut, 'Senin - Jumat', atau 'Semua Hari'."
         />
@@ -216,11 +219,10 @@ export const TargetDrawer: React.FC<TargetDrawerProps> = ({
                 key={val}
                 type="button"
                 onClick={() => onChange({ ...formData, nilai: val })}
-                className={`text-[11px] font-mono px-2 py-0.5 rounded border transition-colors cursor-pointer ${
-                  Number(formData.nilai) === val
+                className={`text-[11px] font-mono px-2 py-0.5 rounded border transition-colors cursor-pointer ${Number(formData.nilai) === val
                     ? 'bg-primary-50 border-primary-500 text-primary-700 font-bold'
                     : 'bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-700'
-                }`}
+                  }`}
               >
                 {val}
               </button>

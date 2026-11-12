@@ -57,7 +57,7 @@ export const TerritoryListPage: React.FC = () => {
               Teritori Management
             </h1>
             <p className="text-body-sm text-gray-600 mt-1">
-              Kelola data wilayah (District) terhubung dengan Operation Unit dan penugasan Salesman lapangan.
+              Kelola data wilayah (District) terhubung dengan Operation Unit.
             </p>
           </div>
 

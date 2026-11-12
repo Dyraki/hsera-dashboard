@@ -74,7 +74,7 @@ export const KaryawanListPage: React.FC = () => {
               Master Karyawan
             </h1>
             <p className="text-body-sm text-gray-600 mt-1">
-              Kelola data SDM lengkap (32 kolom) terhubung dengan Operation Unit, Atasan, dan Akun Login.
+              Kelola data SDM terhubung dengan Operation Unit, Atasan, dan Akun Login.
             </p>
           </div>
 
