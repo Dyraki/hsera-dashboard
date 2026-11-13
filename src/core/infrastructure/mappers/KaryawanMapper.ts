@@ -35,6 +35,7 @@ export const toKaryawanWriteDto = (data: KaryawanWriteData): KaryawanWriteDto =>
   originalDateOfHire: data.originalDateOfHire,
   permanentDate: data.permanentDate,
   actualTerminationDate: data.actualTerminationDate,
+  bankId: data.bankId || null,
   accountName: data.accountName,
   accountNumber: data.accountNumber,
   status: data.status

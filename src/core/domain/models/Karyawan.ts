@@ -89,6 +89,7 @@ export interface KaryawanWriteData {
   originalDateOfHire: string | null;
   permanentDate: string | null;
   actualTerminationDate: string | null;
+  bankId?: string | null;
   accountName: string | null;
   accountNumber: string | null;
   status: boolean;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { findBankByIdOrCode } from '@/core/constants/banks';
 import { EmployeeData, UserAccountData } from '../types';
 import { 
   Building2, 
@@ -206,10 +207,28 @@ export const ProfileEmployeeInfoTab: React.FC<ProfileEmployeeInfoTabProps> = ({ 
               </h3>
             </div>
             <div className="p-5 divide-y divide-slate-100 text-sm">
-              <div className="py-2.5 flex justify-between gap-4">
+              <div className="py-2.5 flex justify-between gap-4 items-baseline">
                 <span className="text-slate-500 font-medium">Nama Bank</span>
                 <span className="text-slate-900 font-semibold text-right">
-                  {karyawan.bankId || '-'}
+                  {(() => {
+                    const bankInfo = findBankByIdOrCode(karyawan.bankId);
+                    if (bankInfo) {
+                      return (
+                        <span className="inline-flex items-center gap-1.5 justify-end">
+                          <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold border border-slate-200">
+                            {bankInfo.code}
+                          </span>
+                          <span>{bankInfo.name}</span>
+                          {bankInfo.alias && (
+                            <span className="text-xs text-indigo-600 font-semibold">
+                              ({bankInfo.alias})
+                            </span>
+                          )}
+                        </span>
+                      );
+                    }
+                    return karyawan.bankId || '-';
+                  })()}
                 </span>
               </div>
               <div className="py-2.5 flex justify-between gap-4">

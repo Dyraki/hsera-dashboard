@@ -17,6 +17,7 @@ export interface KaryawanFormValues {
   originalDateOfHire: string;
   permanentDate: string;
   actualTerminationDate: string;
+  bankId: string;
   accountName: string;
   accountNumber: string;
   status: boolean;

@@ -22,6 +22,7 @@ const emptyFormValues: KaryawanFormValues = {
   originalDateOfHire: '',
   permanentDate: '',
   actualTerminationDate: '',
+  bankId: '',
   accountName: '',
   accountNumber: '',
   status: true
@@ -94,6 +95,7 @@ export const useKaryawanForm = ({
       originalDateOfHire: employee.originalDateOfHire?.substring(0, 10) || '',
       permanentDate: employee.permanentDate?.substring(0, 10) || '',
       actualTerminationDate: employee.actualTerminationDate?.substring(0, 10) || '',
+      bankId: employee.bankId || '',
       accountName: employee.accountName || '',
       accountNumber: employee.accountNumber || '',
       status: employee.status
@@ -137,6 +139,7 @@ export const useKaryawanForm = ({
       originalDateOfHire: formValues.originalDateOfHire || null,
       permanentDate: formValues.permanentDate || null,
       actualTerminationDate: formValues.actualTerminationDate || null,
+      bankId: formValues.bankId ? formValues.bankId.trim() || null : null,
       accountName: formValues.accountName.trim() || null,
       accountNumber: formValues.accountNumber.trim() || null
     };
