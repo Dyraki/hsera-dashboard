@@ -12,6 +12,7 @@ import { Input, Select, Checkbox } from '../../../components/form';
 import { Button } from '@/presentation/components/ui/Button';
 import { Badge } from '@/presentation/components/ui/Badge';
 import { Plus, Pencil, Trash2, Shield, AlertCircle } from 'lucide-react';
+import { generateUUID } from '@/core/utils/uuid';
 
 export const RoleListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -90,7 +91,7 @@ export const RoleListPage: React.FC = () => {
     setDrawerMode('create');
     setEditId(null);
     setFormError(null);
-    setFormId(crypto.randomUUID());
+    setFormId(generateUUID());
     setFormNama('');
     setFormAktif(1);
     setIsDrawerOpen(true);

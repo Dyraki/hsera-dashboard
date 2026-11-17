@@ -29,6 +29,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { validatePassword, generateStrongPassword } from '@/core/utils/passwordSecurity';
+import { generateUUID } from '@/core/utils/uuid';
 import { PasswordStrengthMeter } from '@/presentation/components/form/PasswordStrengthMeter';
 
 export const RoleUserPage: React.FC = () => {
@@ -93,7 +94,7 @@ export const RoleUserPage: React.FC = () => {
     }
     setModalMode('create');
     setSelectedUser(null);
-    setFormId(crypto.randomUUID());
+    setFormId(generateUUID());
     setFormUsername('');
     setFormPassword('');
     setFormConfirmPassword('');
