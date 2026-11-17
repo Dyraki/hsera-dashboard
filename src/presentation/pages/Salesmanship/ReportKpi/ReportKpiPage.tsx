@@ -19,8 +19,6 @@ export const ReportKpiPage: React.FC = () => {
     error,
     isSuperAdmin,
     fetchReport,
-    handleExportCsv,
-    handlePrint,
   } = useKpiReport();
 
   const [highlightedWeek, setHighlightedWeek] = useState<number | 'all'>('all');
@@ -51,8 +49,6 @@ export const ReportKpiPage: React.FC = () => {
           isLoadingDistricts={isLoadingDistricts}
           availableWeeks={reportData?.weeks || []}
           onRefresh={fetchReport}
-          onExportCsv={handleExportCsv}
-          onPrint={handlePrint}
         />
 
         {/* 2. Loading State */}

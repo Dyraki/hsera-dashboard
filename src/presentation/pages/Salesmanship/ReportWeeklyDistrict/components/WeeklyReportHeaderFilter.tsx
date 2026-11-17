@@ -10,8 +10,6 @@ import {
   Building2,
   MapPin,
   Filter,
-  FileSpreadsheet,
-  Printer,
   RotateCcw,
   Lock,
 } from 'lucide-react';
@@ -26,8 +24,6 @@ interface WeeklyReportHeaderFilterProps {
   isLoading?: boolean;
   isLocked?: boolean;
   lockStatusText?: string;
-  onExportExcel: () => void;
-  onPrint: () => void;
   onRefresh: () => void;
 }
 
@@ -41,8 +37,6 @@ export const WeeklyReportHeaderFilter: React.FC<WeeklyReportHeaderFilterProps> =
   isLoading = false,
   isLocked = false,
   lockStatusText,
-  onExportExcel,
-  onPrint,
   onRefresh,
 }) => {
   return (
@@ -87,26 +81,6 @@ export const WeeklyReportHeaderFilter: React.FC<WeeklyReportHeaderFilterProps> =
           >
             <RotateCcw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             <span>Segarkan</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onExportExcel}
-            disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-            <span>Ekspor Excel</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onPrint}
-            disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-primary-800 bg-primary-50 hover:bg-primary-100 border border-primary-300 rounded-lg shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
-          >
-            <Printer className="w-4 h-4 text-primary-600" />
-            <span>Cetak</span>
           </button>
         </div>
       </div>

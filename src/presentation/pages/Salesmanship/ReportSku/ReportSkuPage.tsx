@@ -25,8 +25,6 @@ export const ReportSkuPage: React.FC = () => {
     filteredSkuRows,
     handleFilterChange,
     refetchReport,
-    handleExportExcel,
-    handlePrint,
     availableQuarters,
   } = useSkuSalesReport();
 
@@ -44,8 +42,6 @@ export const ReportSkuPage: React.FC = () => {
           isLoading={isLoading || isLoadingDistricts}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onExportExcel={handleExportExcel}
-          onPrint={handlePrint}
           onRefresh={refetchReport}
         />
 

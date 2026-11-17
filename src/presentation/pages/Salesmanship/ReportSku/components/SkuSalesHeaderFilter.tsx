@@ -4,8 +4,6 @@ import {
   Building2,
   MapPin,
   RefreshCw,
-  Download,
-  Printer,
   Search,
   Filter,
   Layers,
@@ -23,8 +21,6 @@ interface SkuSalesHeaderFilterProps {
   isLoading: boolean;
   searchQuery: string;
   onSearchChange: (q: string) => void;
-  onExportExcel: () => void;
-  onPrint: () => void;
   onRefresh: () => void;
 }
 
@@ -38,8 +34,6 @@ export const SkuSalesHeaderFilter: React.FC<SkuSalesHeaderFilterProps> = ({
   isLoading,
   searchQuery,
   onSearchChange,
-  onExportExcel,
-  onPrint,
   onRefresh,
 }) => {
   return (
@@ -67,26 +61,6 @@ export const SkuSalesHeaderFilter: React.FC<SkuSalesHeaderFilterProps> = ({
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2 self-start md:self-auto">
-          <button
-            type="button"
-            onClick={onPrint}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-2xs cursor-pointer"
-            title="Cetak Laporan"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Cetak</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onExportExcel}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100/80 transition-colors shadow-2xs cursor-pointer"
-            title="Ekspor format Excel / CSV"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export CSV</span>
-          </button>
-
           <button
             type="button"
             onClick={onRefresh}

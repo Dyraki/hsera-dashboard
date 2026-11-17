@@ -27,8 +27,6 @@ export const ReportNotasiPage: React.FC = () => {
     handleSort,
     filteredSkuRows,
     fetchReport,
-    handleExportCsv,
-    handlePrint,
   } = useNotationReport();
 
   const [highlightedDay, setHighlightedDay] = useState<string | number | 'all'>('all');
@@ -76,8 +74,6 @@ export const ReportNotasiPage: React.FC = () => {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onRefresh={fetchReport}
-          onExportCsv={handleExportCsv}
-          onPrint={handlePrint}
         />
 
         {/* 2. Loading State */}

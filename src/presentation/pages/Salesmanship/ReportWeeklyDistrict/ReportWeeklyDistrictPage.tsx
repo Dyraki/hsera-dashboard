@@ -22,8 +22,6 @@ export const ReportWeeklyDistrictPage: React.FC = () => {
     filters,
     handleFilterChange,
     refetchReport,
-    handlePrint,
-    handleExportExcel,
   } = useWeeklyDistrictReport();
 
   return (
@@ -40,8 +38,6 @@ export const ReportWeeklyDistrictPage: React.FC = () => {
           isLoading={isLoading || isLoadingDistricts}
           isLocked={reportData?.header.isLocked}
           lockStatusText={reportData?.header.lockStatusText}
-          onExportExcel={handleExportExcel}
-          onPrint={handlePrint}
           onRefresh={refetchReport}
         />
 

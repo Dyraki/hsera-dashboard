@@ -4,8 +4,6 @@ import {
   Filter,
   Building2,
   MapPin,
-  Download,
-  Printer,
   RefreshCw,
   Clock,
   Sparkles,
@@ -24,8 +22,6 @@ interface KpiReportHeaderFilterProps {
   isLoadingDistricts: boolean;
   availableWeeks: KpiWeeklyDataPoint[];
   onRefresh: () => void;
-  onExportCsv: () => void;
-  onPrint: () => void;
 }
 
 export const KpiReportHeaderFilter: React.FC<KpiReportHeaderFilterProps> = ({
@@ -38,8 +34,6 @@ export const KpiReportHeaderFilter: React.FC<KpiReportHeaderFilterProps> = ({
   isLoadingDistricts,
   availableWeeks,
   onRefresh,
-  onExportCsv,
-  onPrint,
 }) => {
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden transition-all duration-200">
@@ -64,26 +58,6 @@ export const KpiReportHeaderFilter: React.FC<KpiReportHeaderFilterProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2 self-stretch md:self-auto justify-end">
-          <button
-            type="button"
-            onClick={onPrint}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-2xs cursor-pointer"
-            title="Cetak Halaman Laporan"
-          >
-            <Printer className="w-3.5 h-3.5 text-gray-500" />
-            <span>Cetak</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onExportCsv}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100/80 transition-colors shadow-2xs cursor-pointer"
-            title="Ekspor data KPI ke format CSV"
-          >
-            <Download className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Export CSV</span>
-          </button>
-
           <button
             type="button"
             onClick={onRefresh}
